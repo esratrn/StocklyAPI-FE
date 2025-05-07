@@ -21,7 +21,8 @@ const handleLogout = () => {
               onClick={() =>
                 document
                   .getElementById('offcanvasDarkNavbar')
-                  .classList.remove('translate-x-full')
+                .classList.remove('translate-x-full')
+                  
               }
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"

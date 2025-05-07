@@ -12,7 +12,7 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await API.post('http://192.168.1.49:7080/api/auth/login', { email, password });
+      const response = await API.post('/login', { email, password });
       console.log("Giriş başarılı", response.data);
       localStorage.setItem('token', response.data.token);
 
