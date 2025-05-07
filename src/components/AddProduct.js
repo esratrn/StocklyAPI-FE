@@ -9,20 +9,55 @@ function AddProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const product = {
-      name,
-      category,
-      quantity,
-      price,
-    };
+   
+    // categoryId eşlemesi (önceden yaptığımız eşleme kodu burada olmalı)
+    const normalizedCategory = category.trim().toLowerCase();
+
+let categoryId = 0;
+if (normalizedCategory === "electronics") {
+  categoryId = 1;
+} else if (normalizedCategory === "office supplies") {
+  categoryId = 2;
+} else if (normalizedCategory === "books") {
+  categoryId = 3;
+} else {
+  alert("Unknown category: " + category);
+}
+
+
+  
+const product = {
+  productName: name,
+  categoryId: categoryId,
+  stockQuantity: parseInt(quantity),
+  price: parseFloat(price),
+  description: "optional desc"
+};
+
+  
     try {
-      await axios.post('http://localhost:5000/api/products', product);
+      const token = localStorage.getItem('token');
+
+await axios.post(
+  "https://localhost:7080/api/Product",
+  product,
+  {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+  }
+);
+
+      
+
       alert('Product added!');
     } catch (error) {
       console.error(error);
       alert('Failed to add product.');
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -95,7 +130,8 @@ function AddProduct() {
             </select>
           </div>
 
-          <label className="text-sm text-gray-700 block mb-1 font-medium">Image</label>
+          {/*<label className="text-sm text-gray-700 block mb-1 font-medium">Image</label>*/}
+          {/*
           <button
             className="p-4 border border-gray-200 bg-gray-100 rounded w-full hover:bg-gray-50 hover:border-b-4 hover:border-b-blue-500 flex items-center active:bg-gray-100"
             type="button"
@@ -118,6 +154,7 @@ function AddProduct() {
             </div>
             <h1 className="font-bold text-gray-700 text-sm">Choose file</h1>
           </button>
+          */}
 
           <button
             type="submit"

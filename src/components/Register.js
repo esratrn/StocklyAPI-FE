@@ -17,13 +17,15 @@ function Register() {
     e.preventDefault();
 
     try {
-      await API.post('/register', {
-        name,
-        surname,
+      await API.post("/register", {
+        firstName: name,
+        lastName: surname,
         email,
         password,
-        role,
-      });
+        jobTitle: role,
+    });
+    
+    
 
       alert('Kayıt başarılı!');
       navigate('/dashboard'); // kayıt sonrası yönlendirme

@@ -13,8 +13,9 @@ function Login() {
     e.preventDefault();
     try {
       const response = await API.post('/login', { email, password });
-      console.log("Giriş başarılı", response.data);
-      localStorage.setItem('token', response.data.token);
+console.log("Giriş başarılı!", response.data);
+localStorage.setItem('token', response.data.token);
+
 
       navigate('/dashboard'); 
     } catch (error) {
