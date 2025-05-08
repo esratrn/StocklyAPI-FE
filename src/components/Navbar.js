@@ -13,7 +13,7 @@ const handleLogout = () => {
   navigate('/login');
 };
     return (
-        <nav className="bg-slate-700 text-white fixed top-0 w-full z-50">
+        <nav style={{ backgroundColor: '#BE123C' }} className=" text-white fixed top-0 w-full z-50">
           <div className="container mx-auto flex items-center justify-between px-4 py-3">
             <a className="text-lg font-semibold" href="/#">Stock Admin Panel</a>
             <button
@@ -32,6 +32,7 @@ const handleLogout = () => {
               </svg>
             </button>
             <div
+            style={{ backgroundColor: '#9F0F34' }}
               id="offcanvasDarkNavbar"
               className="fixed top-0 right-0 w-72 h-full bg-slate-800 text-white transform translate-x-full transition-transform duration-300 ease-in-out shadow-lg"
             >
@@ -79,40 +80,39 @@ const handleLogout = () => {
 </li>
 
 <li>
-  <a className="hover:text-gray-300 font-medium flex items-center gap-1" href="/#">
+  <Link to="/sales-orders" className="hover:text-gray-300 font-medium flex items-center gap-1">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-box2-heart" viewBox="0 0 16 16">
       <path d="M8 7.982C9.664 6.309 13.825 9.236 8 13 2.175 9.236 6.336 6.31 8 7.982"/>
       <path d="M3.75 0a1 1 0 0 0-.8.4L.1 4.2a.5.5 0 0 0-.1.3V15a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V4.5a.5.5 0 0 0-.1-.3L13.05.4a1 1 0 0 0-.8-.4zm0 1H7.5v3h-6zM8.5 4V1h3.75l2.25 3zM15 5v10H1V5z"/>
     </svg>
     Sales Orders
-  </a>
+  </Link>
 </li>
 
 <li>
-  <a className="hover:text-gray-300 font-medium flex items-center gap-1" href="/#">
+  <Link to="/purchase-orders" className="hover:text-gray-300 font-medium flex items-center gap-1">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-box2-heart-fill" viewBox="0 0 16 16">
       <path d="M3.75 0a1 1 0 0 0-.8.4L.1 4.2a.5.5 0 0 0-.1.3V15a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V4.5a.5.5 0 0 0-.1-.3L13.05.4a1 1 0 0 0-.8-.4zM8.5 4h6l.5.667V5H1v-.333L1.5 4h6V1h1zM8 7.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132"/>
     </svg>
     Purchase Orders
-  </a>
+  </Link>
 </li>
-
 <li>
-  <a className="hover:text-gray-300 font-medium flex items-center gap-1" href="/#">
+  <Link to="/suppliers" className="hover:text-gray-300 font-medium flex items-center gap-1">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-box-seam" viewBox="0 0 16 16">
       <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2zm3.564 1.426L5.596 5 8 5.961 14.154 3.5zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z"/>
     </svg>
     Suppliers
-  </a>
+  </Link>
 </li>
 
 <li>
-  <a className="hover:text-gray-300 font-medium flex items-center gap-1" href="/#">
+  <Link to="/warehouses" className="hover:text-gray-300 font-medium flex items-center gap-1">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-box-seam-fill" viewBox="0 0 16 16">
       <path fillRule="evenodd" d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.01-.003.268-.108a.75.75 0 0 1 .558 0l.269.108.01.003zM10.404 2 4.25 4.461 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339L8 5.961 5.596 5l6.154-2.461z"/>
     </svg>
     Warehouses
-  </a>
+  </Link>
 </li>
 
                   <li className="group relative">
@@ -133,20 +133,6 @@ const handleLogout = () => {
                     </ul>
                   </li>
                 </ul>
-                <form className="mt-4 flex flex-col space-y-2">
-                  <input
-                    className="p-2 rounded text-black focus:outline-none"
-                    type="search"
-                    placeholder="Search"
-                    aria-label="Search"
-                  />
-                  <button
-                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-                    type="submit"
-                  >
-                    Search
-                  </button>
-                </form>
               </div>
             </div>
           </div>

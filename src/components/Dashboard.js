@@ -2,7 +2,7 @@ import React from 'react';
 
 function Dashboard() {
   return (
-    <div className="min-h-screen text-white p-6 pt-16">
+    <div style={{ backgroundColor: '#F5F5F4' }}className="min-h-screen text-white p-6 pt-16">
         <div className="flex justify-start mb-6">
     <h1 className="text-3xl font-semibold text-black">Dashboard</h1>
   </div>
