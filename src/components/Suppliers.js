@@ -92,7 +92,7 @@ const Suppliers = () => {
   const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 pt-16">
+    <div className="min-h-screen bg-gray-400 text-white p-8 pt-16">
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
         <h1 className="text-3xl font-bold">Suppliers</h1>
         <button
@@ -101,7 +101,7 @@ const Suppliers = () => {
             setFormData({ supplier_name: "", contact_info: "" });
             setEditingId(null);
           }}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+          className="bg-green-700 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded"
         >
           {showForm ? "Close Form" : "+ Add Supplier"}
         </button>
@@ -112,7 +112,7 @@ const Suppliers = () => {
         placeholder="Search by name..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="p-2 mb-4 w-full md:w-1/2 rounded bg-gray-800 text-white border border-gray-600"
+        className="p-2 mb-4 w-full md:w-1/2 rounded bg-gray-600 text-white border border-gray-600"
       />
 
       {showForm && (
@@ -147,7 +147,7 @@ const Suppliers = () => {
       )}
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+        <table className="min-w-full bg-gray-600 rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-gray-700 text-left text-sm uppercase tracking-wider">
               <th className="px-6 py-3">ID</th>
@@ -158,7 +158,7 @@ const Suppliers = () => {
           </thead>
           <tbody>
             {paginated.map((s) => (
-              <tr key={s.id} className="border-t border-gray-700 hover:bg-gray-600 transition">
+              <tr key={s.id} className="border-t border-gray-600 hover:bg-gray-700 transition">
                 <td className="px-6 py-4">SUP{String(s.id).padStart(4, "0")}</td>
                 <td className="px-6 py-4">{s.supplier_name}</td>
                 <td className="px-6 py-4">{s.contact_info}</td>
@@ -186,7 +186,7 @@ const Suppliers = () => {
         <button
           disabled={currentPage === 1}
           onClick={() => setCurrentPage(currentPage - 1)}
-          className="bg-gray-700 text-white px-4 py-2 rounded disabled:opacity-40"
+          className="bg-green-700 text-white px-4 py-2 rounded disabled:opacity-40"
         >
           ← Previous
         </button>
@@ -196,7 +196,7 @@ const Suppliers = () => {
         <button
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage(currentPage + 1)}
-          className="bg-gray-700 text-white px-4 py-2 rounded disabled:opacity-40"
+          className="bg-green-700 text-white px-4 py-2 rounded disabled:opacity-40"
         >
           Next →
         </button>

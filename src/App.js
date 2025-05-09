@@ -10,6 +10,7 @@ import StockStatus from './components/StockStatus';
 import PurchaseOrders from './components/PurchaseOrders';
 import Warehouses from './components/Warehouses';
 import Suppliers from './components/Suppliers';
+import Notifications from './components/Notifications';
 
 function AppContent() {
   const location = useLocation();
@@ -30,6 +31,7 @@ function AppContent() {
           <Route path="/stock-status" element={<StockStatus />} />
           <Route path="/purchase-orders" element={<PurchaseOrders />} />
           <Route path="/suppliers" element={<Suppliers />} />
+          <Route path="/notifications" element={<Notifications />} />
         </Routes>
       </div>
     </>

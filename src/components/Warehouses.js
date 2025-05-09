@@ -81,7 +81,7 @@ const Warehouses = () => {
   const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 pt-16">
+    <div className="min-h-screen bg-gray-400 text-white p-8 pt-16">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h1 className="text-3xl font-bold">Warehouses</h1>
         <button
@@ -91,7 +91,7 @@ const Warehouses = () => {
             setFormData({ warehouse_name: "", location: "" });
           }}
           className={`${
-            showForm ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700"
+            showForm ? "bg-green-600 hover:bg-red-700" : "bg-green-700 hover:bg-green-600"
           } text-white font-semibold py-2 px-4 rounded`}
         >
           {showForm ? "✖ Close Form" : "+ Add Warehouse"}
@@ -103,7 +103,7 @@ const Warehouses = () => {
         placeholder="Search by name..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="p-2 mb-4 w-full md:w-1/2 rounded bg-gray-800 text-white border border-gray-600"
+        className="p-2 mb-4 w-full md:w-1/2 rounded bg-gray-600 text-white border border-gray-600"
       />
 
       {showForm && (
@@ -138,7 +138,7 @@ const Warehouses = () => {
       )}
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+        <table className="min-w-full bg-gray-600 rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-gray-700 text-left text-sm uppercase tracking-wider">
               <th className="px-6 py-3">ID</th>
@@ -151,7 +151,7 @@ const Warehouses = () => {
             {paginated.map((w) => (
               <tr
                 key={w.id}
-                className="border-t border-gray-700 hover:bg-gray-600 transition"
+                className="border-t border-gray-700 hover:bg-gray-700 transition"
               >
                 <td className="px-6 py-4">WH{String(w.id).padStart(4, "0")}</td>
                 <td className="px-6 py-4">{w.warehouse_name}</td>
@@ -180,7 +180,7 @@ const Warehouses = () => {
         <button
           disabled={currentPage === 1}
           onClick={() => setCurrentPage(currentPage - 1)}
-          className="bg-gray-700 text-white px-4 py-2 rounded disabled:opacity-40"
+          className="bg-green-700 text-white px-4 py-2 rounded disabled:opacity-40"
         >
           ← Previous
         </button>
@@ -190,7 +190,7 @@ const Warehouses = () => {
         <button
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage(currentPage + 1)}
-          className="bg-gray-700 text-white px-4 py-2 rounded disabled:opacity-40"
+          className="bg-green-700 text-white px-4 py-2 rounded disabled:opacity-40"
         >
           Next →
         </button>

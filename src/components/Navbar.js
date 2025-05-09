@@ -15,7 +15,7 @@ const handleLogout = () => {
     return (
         <nav style={{ backgroundColor: '#BE123C' }} className=" text-white fixed top-0 w-full z-50">
           <div className="container mx-auto flex items-center justify-between px-4 py-3">
-            <a className="text-lg font-semibold" href="/#">Stock Admin Panel</a>
+            <a className="text-lg font-semibold" href="/#">STOCKLY</a>
             <button
               className="text-white focus:outline-none"
               onClick={() =>
@@ -118,7 +118,7 @@ const handleLogout = () => {
                   <li className="group relative">
                     <button className="hover:text-gray-300 font-medium cursor-pointer">Dropdown ▼</button>
                     <ul className="ml-4 mt-1 hidden group-hover:block">
-                      <li><a className="hover:text-gray-300 block" href="/#">Notifications</a></li>
+                    <Link to="/notifications">Notifications</Link>
                       <li><a className="hover:text-gray-300 block" href="/#">Profile</a></li>
                       <li><hr className="border-gray-600 my-2" /></li>
                       <li>
