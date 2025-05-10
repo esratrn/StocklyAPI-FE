@@ -144,7 +144,7 @@ fill="currentColor"
             <div className="flex items-center justify-center mt-8">
               <button
                 type="submit"
-                className="text-white py-2 px-4 uppercase rounded bg-indigo-500 hover:bg-indigo-600 shadow hover:shadow-lg font-medium transition"
+                className="text-white py-2 px-4 uppercase rounded bg-rose-700 hover:bg-rose-600 shadow hover:shadow-lg font-medium transition"
               >
                 Create Account
               </button>

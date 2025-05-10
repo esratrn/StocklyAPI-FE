@@ -10,8 +10,10 @@ const SalesOrders = () => {
   const [newStatus, setNewStatus] = useState("Pending");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [editingId, setEditingId] = useState(null);            // ✅ eklendi
-  const [editingStatus, setEditingStatus] = useState("");      // ✅ eklendi
+  const [editingId, setEditingId] = useState(null);
+  const [editingStatus, setEditingStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -37,7 +39,6 @@ const SalesOrders = () => {
     }
 
     const priceNumber = parseFloat(newPrice.replace(',', '.'));
-
     if (isNaN(priceNumber)) {
       toast.error("Please enter a valid price.");
       return;
@@ -67,37 +68,35 @@ const SalesOrders = () => {
     }
   };
 
-  const handleEditOrder = (orderId) => {                      // ✅ eklendi
+  const handleEditOrder = (orderId) => {
     const orderToEdit = salesData.find((o) => o.id === orderId);
     setEditingId(orderId);
     setEditingStatus(orderToEdit.status);
   };
 
   const handleSaveStatus = async (orderId) => {
-  const orderToEdit = salesData.find((o) => o.id === orderId);
-
-  try {
-    await axios.put(
-      `https://localhost:7080/api/SalesOrders/${orderId}`,
-      {
-        id: orderId,
-        userId: orderToEdit.userId,         // ✅ mevcut userId
-        orderDate: orderToEdit.orderDate,   // ✅ mevcut tarih
-        status: editingStatus,              // ✅ güncellenmiş status
-        price: orderToEdit.price            // ✅ mevcut fiyat
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    toast.success("Status updated!");
-    fetchSalesOrders();
-    setEditingId(null);
-  } catch (error) {
-    toast.error("Failed to update status.");
-  }
-};
-
+    const orderToEdit = salesData.find((o) => o.id === orderId);
+    try {
+      await axios.put(
+        `https://localhost:7080/api/SalesOrders/${orderId}`,
+        {
+          id: orderId,
+          userId: orderToEdit.userId,
+          orderDate: orderToEdit.orderDate,
+          status: editingStatus,
+          price: orderToEdit.price
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      toast.success("Status updated!");
+      fetchSalesOrders();
+      setEditingId(null);
+    } catch (error) {
+      toast.error("Failed to update status.");
+    }
+  };
 
   const handleDeleteOrder = async (orderId) => {
     try {
@@ -116,6 +115,10 @@ const SalesOrders = () => {
       order.id.toString().includes(searchQuery) &&
       (statusFilter === "All" || order.status === statusFilter)
   );
+
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = filteredOrders.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="min-h-screen bg-gray-400 text-white p-8 pt-16">
@@ -188,93 +191,94 @@ const SalesOrders = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.map((order) => (
+            {paginatedData.map((order) => (
               <tr key={order.id} className="border-t border-gray-700 hover:bg-gray-700 transition">
                 <td className="px-6 py-4">{order.id}</td>
                 <td className="px-6 py-4">{new Date(order.orderDate).toLocaleString()}</td>
+                <td className="px-6 py-4">${order.price.toFixed(2)}</td>
                 <td className="px-6 py-4">
-                  ${order.price !== undefined ? order.price.toFixed(2) : "-"}
+                  {editingId === order.id ? (
+                    <select
+                      value={editingStatus}
+                      onChange={(e) => setEditingStatus(e.target.value)}
+                      className="p-1 rounded bg-gray-600 text-white"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="Delivered">Delivered</option>
+                    </select>
+                  ) : (
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        order.status.toLowerCase() === "cancelled"
+                          ? "bg-red-500"
+                          : order.status.toLowerCase() === "pending"
+                          ? "bg-yellow-500"
+                          : order.status.toLowerCase() === "shipped"
+                          ? "bg-green-500"
+                          : order.status.toLowerCase() === "delivered"
+                          ? "bg-blue-500"
+                          : "bg-gray-500"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  )}
                 </td>
-               <td className="px-6 py-4">
-  {editingId === order.id ? (
-    <select
-      value={editingStatus}
-      onChange={(e) => setEditingStatus(e.target.value)}
-      className="p-1 rounded bg-gray-600 text-white"
-    >
-      <option value="Pending">Pending</option>
-      <option value="Shipped">Shipped</option>
-      <option value="Cancelled">Cancelled</option>
-      <option value="Delivered">Delivered</option>
-    </select>
-  ) : (
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-        order.status.toLowerCase() === "cancelled"
-          ? "bg-red-500"
-          : order.status.toLowerCase() === "pending"
-          ? "bg-yellow-500"
-          : order.status.toLowerCase() === "shipped"
-          ? "bg-green-500"
-          : order.status.toLowerCase() === "delivered"
-          ? "bg-blue-500"
-          : "bg-gray-500"
-      }`}
-    >
-      {order.status}
-    </span>
-  )}
-</td>
-
-
                 <td className="px-6 py-4 space-x-2">
-  {editingId === order.id ? (
-    <div className="flex gap-2">
-      <select
-        value={editingStatus}
-        onChange={(e) => setEditingStatus(e.target.value)}
-        className="p-1 rounded bg-gray-600 text-white"
-      >
-        <option value="Pending">Pending</option>
-        <option value="Shipped">Shipped</option>
-        <option value="Cancelled">Cancelled</option>
-        <option value="Delivered">Delivered</option>
-      </select>
-      <button
-        onClick={() => handleSaveStatus(order.id)}
-        className="bg-blue-600 hover:bg-blue-500 px-2 py-1 rounded text-xs"
-      >
-        Save
-      </button>
-      <button
-        onClick={() => setEditingId(null)}
-        className="bg-gray-500 hover:bg-gray-400 px-2 py-1 rounded text-xs"
-      >
-        Cancel
-      </button>
-    </div>
-  ) : (
-    <button
-      onClick={() => handleEditOrder(order.id)}
-      className="text-blue-300 flex items-center gap-1"
-    >
-      ✏ Edit
-    </button>
-  )}
-</td>
-
+                  {editingId === order.id ? (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleSaveStatus(order.id)}
+                        className="bg-blue-600 hover:bg-blue-500 px-2 py-1 rounded text-xs"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="bg-gray-500 hover:bg-gray-400 px-2 py-1 rounded text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleEditOrder(order.id)}
+                      className="text-blue-300 flex items-center gap-1"
+                    >
+                      ✏ Edit
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
+      <div className="flex justify-center mt-6 space-x-4">
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(currentPage - 1)}
+          className="bg-green-700 text-white px-4 py-2 rounded disabled:opacity-40"
+        >
+          ← Previous
+        </button>
+        <span className="px-4 py-2 text-sm">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(currentPage + 1)}
+          className="bg-green-700 text-white px-4 py-2 rounded disabled:opacity-40"
+        >
+          Next →
+        </button>
+      </div>
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };
 
 export default SalesOrders;
-
-
-

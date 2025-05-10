@@ -28,7 +28,7 @@ localStorage.setItem('token', response.data.token);
     
     <div className="">
       <div className="flex justify-end p-4">
-  <a href="/register" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition">
+  <a href="/register" className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-600 transition">
     SIGN UP
   </a>
 </div>
@@ -99,7 +99,7 @@ localStorage.setItem('token', response.data.token);
             <div className="flex items-center justify-center mt-8">
               <button
                 type="submit"
-                className="text-white py-2 px-4 uppercase rounded bg-indigo-500 hover:bg-indigo-600 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
+                className="text-white py-2 px-4 uppercase rounded bg-rose-700 hover:bg-rose-600 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
               >
                 Sign in
               </button>

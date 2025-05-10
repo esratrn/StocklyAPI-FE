@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 const PurchaseOrders = () => {
   const [purchaseData, setPurchaseData] = useState([]);
   const [newSupplierId, setNewSupplierId] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [newDate, setNewDate] = useState("");
   const [newStatus, setNewStatus] = useState("Pending");
@@ -149,23 +150,24 @@ const PurchaseOrders = () => {
         </div>
       </form>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      <div className="flex flex-col md:flex-row gap-4 mb-4">
         <input
           type="text"
-          placeholder="Search by Order ID..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
+          placeholder="Search by order ID..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full md:w-1/2 p-2 rounded bg-gray-600 text-white border border-gray-600"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
+          className="w-full md:w-1/2 p-2 rounded bg-gray-600 text-white border border-gray-600"
         >
           <option value="All">All Statuses</option>
           <option value="Pending">Pending</option>
           <option value="Completed">Completed</option>
           <option value="Cancelled">Cancelled</option>
+          
         </select>
       </div>
 
@@ -261,7 +263,7 @@ const PurchaseOrders = () => {
         <button
           disabled={currentPage === 1}
           onClick={() => setCurrentPage(currentPage - 1)}
-          className="bg-gray-700 text-white px-4 py-2 rounded disabled:opacity-40"
+          className="bg-green-700 text-white px-4 py-2 rounded disabled:opacity-40"
         >
           ← Previous
         </button>
@@ -271,7 +273,7 @@ const PurchaseOrders = () => {
         <button
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage(currentPage + 1)}
-          className="bg-gray-700 text-white px-4 py-2 rounded disabled:opacity-40"
+          className="bg-green-700 text-white px-4 py-2 rounded disabled:opacity-40"
         >
           Next →
         </button>
