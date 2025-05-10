@@ -8,7 +8,11 @@ const SalesOrders = () => {
   const [newPrice, setNewPrice] = useState("");
   const [newDate, setNewDate] = useState("");
   const [newStatus, setNewStatus] = useState("Pending");
-  const token = localStorage.getItem("token"); // token localStorage’dan alınır
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [editingId, setEditingId] = useState(null);            // ✅ eklendi
+  const [editingStatus, setEditingStatus] = useState("");      // ✅ eklendi
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchSalesOrders();
@@ -32,19 +36,26 @@ const SalesOrders = () => {
       return;
     }
 
+    const priceNumber = parseFloat(newPrice.replace(',', '.'));
+
+    if (isNaN(priceNumber)) {
+      toast.error("Please enter a valid price.");
+      return;
+    }
+
     try {
       const response = await axios.post(
-  "https://localhost:7080/api/SalesOrders",
-  {
-    userId: 1, // örnek userId
-    orderDate: newDate,
-    status: newStatus,
-    price: parseFloat(newPrice), // ← price’ı da ekliyoruz
-  },
-  {
-    headers: { Authorization: `Bearer ${token}` },
-  }
-);
+        "https://localhost:7080/api/SalesOrders",
+        {
+          userId: 1,
+          orderDate: newDate,
+          status: newStatus,
+          price: priceNumber,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       setSalesData([response.data, ...salesData]);
       setNewPrice("");
@@ -55,6 +66,38 @@ const SalesOrders = () => {
       toast.error("Failed to add order.");
     }
   };
+
+  const handleEditOrder = (orderId) => {                      // ✅ eklendi
+    const orderToEdit = salesData.find((o) => o.id === orderId);
+    setEditingId(orderId);
+    setEditingStatus(orderToEdit.status);
+  };
+
+  const handleSaveStatus = async (orderId) => {
+  const orderToEdit = salesData.find((o) => o.id === orderId);
+
+  try {
+    await axios.put(
+      `https://localhost:7080/api/SalesOrders/${orderId}`,
+      {
+        id: orderId,
+        userId: orderToEdit.userId,         // ✅ mevcut userId
+        orderDate: orderToEdit.orderDate,   // ✅ mevcut tarih
+        status: editingStatus,              // ✅ güncellenmiş status
+        price: orderToEdit.price            // ✅ mevcut fiyat
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    toast.success("Status updated!");
+    fetchSalesOrders();
+    setEditingId(null);
+  } catch (error) {
+    toast.error("Failed to update status.");
+  }
+};
+
 
   const handleDeleteOrder = async (orderId) => {
     try {
@@ -68,6 +111,12 @@ const SalesOrders = () => {
     }
   };
 
+  const filteredOrders = salesData.filter(
+    (order) =>
+      order.id.toString().includes(searchQuery) &&
+      (statusFilter === "All" || order.status === statusFilter)
+  );
+
   return (
     <div className="min-h-screen bg-gray-400 text-white p-8 pt-16">
       <h1 className="text-3xl font-bold mb-6">Sales Orders</h1>
@@ -75,11 +124,10 @@ const SalesOrders = () => {
       <form onSubmit={handleAddOrder} className="mb-6 bg-gray-700 p-4 rounded space-y-4">
         <div className="flex flex-col md:flex-row gap-4">
           <input
-            type="number"
-            min="0"
+            type="text"
             placeholder="Price"
             value={newPrice}
-            onChange={(e) => setNewPrice(e.target.value)}
+            onChange={(e) => setNewPrice(e.target.value.replace(',', '.'))}
             className="w-full md:w-1/4 p-2 rounded bg-gray-600 text-white border border-gray-600"
           />
           <input
@@ -107,6 +155,27 @@ const SalesOrders = () => {
         </div>
       </form>
 
+      <div className="flex flex-col md:flex-row gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search by order ID..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full md:w-1/2 p-2 rounded bg-gray-600 text-white border border-gray-600"
+        />
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="w-full md:w-1/2 p-2 rounded bg-gray-600 text-white border border-gray-600"
+        >
+          <option value="All">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Shipped">Shipped</option>
+          <option value="Cancelled">Cancelled</option>
+          <option value="Delivered">Delivered</option>
+        </select>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-gray-600 rounded-lg overflow-hidden">
           <thead>
@@ -119,20 +188,81 @@ const SalesOrders = () => {
             </tr>
           </thead>
           <tbody>
-            {salesData.map((order) => (
+            {filteredOrders.map((order) => (
               <tr key={order.id} className="border-t border-gray-700 hover:bg-gray-700 transition">
                 <td className="px-6 py-4">{order.id}</td>
                 <td className="px-6 py-4">{new Date(order.orderDate).toLocaleString()}</td>
-                <td className="px-6 py-4"> ${order.price !== undefined ? order.price.toFixed(2) : "-"}</td>
-                <td className="px-6 py-4">{order.status}</td>
                 <td className="px-6 py-4">
-                  <button
-                    onClick={() => handleDeleteOrder(order.id)}
-                    className="bg-red-600 hover:bg-red-500 px-3 py-1 rounded text-white"
-                  >
-                    Delete
-                  </button>
+                  ${order.price !== undefined ? order.price.toFixed(2) : "-"}
                 </td>
+               <td className="px-6 py-4">
+  {editingId === order.id ? (
+    <select
+      value={editingStatus}
+      onChange={(e) => setEditingStatus(e.target.value)}
+      className="p-1 rounded bg-gray-600 text-white"
+    >
+      <option value="Pending">Pending</option>
+      <option value="Shipped">Shipped</option>
+      <option value="Cancelled">Cancelled</option>
+      <option value="Delivered">Delivered</option>
+    </select>
+  ) : (
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+        order.status.toLowerCase() === "cancelled"
+          ? "bg-red-500"
+          : order.status.toLowerCase() === "pending"
+          ? "bg-yellow-500"
+          : order.status.toLowerCase() === "shipped"
+          ? "bg-green-500"
+          : order.status.toLowerCase() === "delivered"
+          ? "bg-blue-500"
+          : "bg-gray-500"
+      }`}
+    >
+      {order.status}
+    </span>
+  )}
+</td>
+
+
+                <td className="px-6 py-4 space-x-2">
+  {editingId === order.id ? (
+    <div className="flex gap-2">
+      <select
+        value={editingStatus}
+        onChange={(e) => setEditingStatus(e.target.value)}
+        className="p-1 rounded bg-gray-600 text-white"
+      >
+        <option value="Pending">Pending</option>
+        <option value="Shipped">Shipped</option>
+        <option value="Cancelled">Cancelled</option>
+        <option value="Delivered">Delivered</option>
+      </select>
+      <button
+        onClick={() => handleSaveStatus(order.id)}
+        className="bg-blue-600 hover:bg-blue-500 px-2 py-1 rounded text-xs"
+      >
+        Save
+      </button>
+      <button
+        onClick={() => setEditingId(null)}
+        className="bg-gray-500 hover:bg-gray-400 px-2 py-1 rounded text-xs"
+      >
+        Cancel
+      </button>
+    </div>
+  ) : (
+    <button
+      onClick={() => handleEditOrder(order.id)}
+      className="text-blue-300 flex items-center gap-1"
+    >
+      ✏ Edit
+    </button>
+  )}
+</td>
+
               </tr>
             ))}
           </tbody>
@@ -145,3 +275,6 @@ const SalesOrders = () => {
 };
 
 export default SalesOrders;
+
+
+

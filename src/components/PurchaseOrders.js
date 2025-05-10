@@ -1,83 +1,92 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const PurchaseOrders = () => {
-  const [purchaseData, setPurchaseData] = useState([
-    {
-      id: 1,
-      supplier_id: 1,
-      price: 250.0,
-      order_date: "2024-06-18T11:25:40Z",
-      status: "Completed",
-    },
-    {
-      id: 2,
-      supplier_id: 2,
-      price: 480.5,
-      order_date: "2024-06-20T14:10:05Z",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      supplier_id: 3,
-      price: 150.75,
-      order_date: "2024-06-22T16:45:55Z",
-      status: "Cancelled",
-    },
-  ]);
-
+  const [purchaseData, setPurchaseData] = useState([]);
   const [newSupplierId, setNewSupplierId] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [newDate, setNewDate] = useState("");
   const [newStatus, setNewStatus] = useState("Pending");
-
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingOrderId, setEditingOrderId] = useState(null);
+  const [editedStatus, setEditedStatus] = useState("Pending");
   const itemsPerPage = 5;
 
-  const handleAddOrder = (e) => {
+  useEffect(() => {
+    fetchPurchaseOrders();
+  }, []);
+
+  const fetchPurchaseOrders = async () => {
+    try {
+      const response = await axios.get("https://localhost:7080/api/PurchaseOrders");
+      setPurchaseData(response.data);
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+      toast.error("Failed to load purchase orders ❌");
+    }
+  };
+
+  const handleAddOrder = async (e) => {
     e.preventDefault();
+
+    const supplierIdValue = parseInt(newSupplierId);
+    const priceValue = parseFloat(newPrice);
+
     if (
-      newSupplierId === "" ||
-      parseInt(newSupplierId) < 0 ||
-      !newPrice ||
+      isNaN(supplierIdValue) ||
+      supplierIdValue < 0 ||
+      isNaN(priceValue) ||
+      priceValue < 0 ||
       !newDate
     ) {
-      toast.error("Please enter valid values (Supplier ID ≥ 0).");
+      toast.error("Please enter valid Supplier ID, Price, and Date.");
       return;
     }
-    if (!newPrice || !newDate) {
-      toast.error("Please fill in all fields.");
-      return;
-    }
-    
-    if (parseFloat(newPrice) < 0) {
-      toast.error("Price cannot be negative ❌");
-      return;
-    }
-    
 
-    const newId = Math.max(...purchaseData.map((o) => o.id)) + 1;
-    const newOrder = {
-      id: newId,
-      supplier_id: parseInt(newSupplierId),
-      price: parseFloat(newPrice),
-      order_date: newDate,
-      status: newStatus,
-    };
+    try {
+      await axios.post("https://localhost:7080/api/PurchaseOrders", {
+        supplierId: supplierIdValue,
+        orderDate: new Date(newDate).toISOString(),
+        price: priceValue,
+        status: newStatus,
+      });
 
-    setPurchaseData([newOrder, ...purchaseData]);
-    toast.success("Purchase order added!");
-    setNewSupplierId("");
-    setNewPrice("");
-    setNewDate("");
-    setNewStatus("Pending");
+      toast.success("Purchase order added!");
+      fetchPurchaseOrders();
+      setNewSupplierId("");
+      setNewPrice("");
+      setNewDate("");
+      setNewStatus("Pending");
+    } catch (error) {
+      console.error("Error adding purchase order:", error);
+      toast.error("Failed to add purchase order ❌");
+    }
+  };
+
+  const handleSaveStatus = async (orderId) => {
+    try {
+      const orderToUpdate = purchaseData.find((o) => o.id === orderId);
+      await axios.put(`https://localhost:7080/api/PurchaseOrders/${orderId}`, {
+        supplierId: orderToUpdate.supplierId,
+        orderDate: orderToUpdate.orderDate,
+        price: orderToUpdate.price,
+        status: editedStatus,
+      });
+      toast.success("Status updated!");
+      setEditingOrderId(null);
+      fetchPurchaseOrders();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to update status ❌");
+    }
   };
 
   const sortedData = [...purchaseData].sort(
-    (a, b) => new Date(b.order_date) - new Date(a.order_date)
+    (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
   );
 
   const filteredData = sortedData.filter(
@@ -97,7 +106,6 @@ const PurchaseOrders = () => {
     <div className="min-h-screen w-full bg-gray-400 text-white p-8 pt-16">
       <h1 className="text-3xl font-bold mb-6">Purchase Orders</h1>
 
-      {/* Add Order Form */}
       <form onSubmit={handleAddOrder} className="bg-gray-700 p-4 rounded mb-6 space-y-4">
         <div className="flex flex-col md:flex-row gap-4">
           <input
@@ -141,7 +149,6 @@ const PurchaseOrders = () => {
         </div>
       </form>
 
-      {/* Filter: Search + Status */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <input
           type="text"
@@ -162,7 +169,6 @@ const PurchaseOrders = () => {
         </select>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-gray-600 rounded-lg overflow-hidden">
           <thead>
@@ -172,6 +178,7 @@ const PurchaseOrders = () => {
               <th className="px-6 py-3">Order Date</th>
               <th className="px-6 py-3">Price</th>
               <th className="px-6 py-3">Status</th>
+              <th className="px-6 py-3">Edit</th>
             </tr>
           </thead>
           <tbody>
@@ -181,9 +188,9 @@ const PurchaseOrders = () => {
                 className="border-t border-gray-600 hover:bg-gray-700 transition"
               >
                 <td className="px-6 py-4">PO{String(order.id).padStart(4, "0")}</td>
-                <td className="px-6 py-4">{order.supplier_id}</td>
+                <td className="px-6 py-4">{order.supplierId}</td>
                 <td className="px-6 py-4">
-                  {new Date(order.order_date).toLocaleString("en-US", {
+                  {new Date(order.orderDate).toLocaleString("en-US", {
                     year: "numeric",
                     month: "2-digit",
                     day: "2-digit",
@@ -207,13 +214,49 @@ const PurchaseOrders = () => {
                     {order.status}
                   </span>
                 </td>
+                <td className="px-6 py-4">
+                  {editingOrderId === order.id ? (
+                    <div className="flex gap-2">
+                      <select
+                        value={editedStatus}
+                        onChange={(e) => setEditedStatus(e.target.value)}
+                        className="p-1 rounded bg-gray-600 text-white border border-gray-600"
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                      <button
+                        onClick={() => handleSaveStatus(order.id)}
+                        className="bg-blue-600 px-2 py-1 rounded text-xs"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditingOrderId(null)}
+                        className="bg-gray-500 px-2 py-1 rounded text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setEditingOrderId(order.id);
+                        setEditedStatus(order.status);
+                      }}
+                      className="text-blue-300 flex items-center gap-1"
+                    >
+                      ✏ Edit
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination */}
       <div className="flex justify-center mt-6 space-x-4">
         <button
           disabled={currentPage === 1}
