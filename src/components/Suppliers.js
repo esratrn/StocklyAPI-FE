@@ -1,90 +1,106 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Suppliers = () => {
-  const [suppliers, setSuppliers] = useState([
-    {
-      id: 1,
-      supplier_name: "NY Tech Supplies Inc.",
-      contact_info: "support@nytech.com | +1 212 555 0101",
-    },
-    {
-      id: 2,
-      supplier_name: "East Coast Office LLC",
-      contact_info: "sales@eastcoastoffice.com | +1 917 555 1234",
-    },
-  ]);
-
+  const [suppliers, setSuppliers] = useState([]);
   const [formData, setFormData] = useState({
     supplier_name: "",
     contact_info: "",
   });
-
   const [editingId, setEditingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const token = localStorage.getItem("token");
+
+  // ✅ Get suppliers from API
+  const fetchSuppliers = async () => {
+    try {
+      const response = await axios.get("https://localhost:7080/api/Suppliers", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setSuppliers(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch suppliers ❌");
+    }
+  };
+
+  useEffect(() => {
+    fetchSuppliers();
+  }, []);
 
   const handleEdit = (supplier) => {
     setFormData({
-      supplier_name: supplier.supplier_name,
-      contact_info: supplier.contact_info,
+      supplier_name: supplier.supplierName,
+      contact_info: supplier.contactInfo,
     });
     setEditingId(supplier.id);
     setShowForm(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this supplier?");
     if (confirmDelete) {
-      const updated = suppliers.filter((s) => s.id !== id);
-      setSuppliers(updated);
-      toast.success("Supplier deleted 🗑");
+      try {
+        await axios.delete(`https://localhost:7080/api/Suppliers/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        toast.success("Supplier deleted 🗑");
+        fetchSuppliers();
+      } catch (error) {
+        toast.error("Error deleting supplier ❌");
+      }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const nameExists = suppliers.some(
-      (s) =>
-        s.supplier_name === formData.supplier_name &&
-        s.id !== editingId
-    );
-    if (nameExists) {
-      toast.error("This supplier already exists ❌");
-      return;
-    }
 
     if (!formData.supplier_name || !formData.contact_info) {
       toast.error("Please fill in all fields ❌");
       return;
     }
 
-    if (editingId) {
-      const updated = suppliers.map((s) =>
-        s.id === editingId ? { ...s, ...formData } : s
-      );
-      setSuppliers(updated);
-      toast.success("Supplier updated ✅");
-    } else {
-      const newSupplier = {
-        id: suppliers.length + 1,
-        ...formData,
-      };
-      setSuppliers([...suppliers, newSupplier]);
-      toast.success("New supplier added 🎉");
-    }
+    const payload = {
+      supplierName: formData.supplier_name,
+      contactInfo: formData.contact_info,
+    };
 
-    setFormData({ supplier_name: "", contact_info: "" });
-    setEditingId(null);
-    setShowForm(false);
+    try {
+      if (editingId) {
+        await axios.put(`https://localhost:7080/api/Suppliers/${editingId}`, payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        toast.success("Supplier updated ✅");
+      } else {
+        await axios.post("https://localhost:7080/api/Suppliers", payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        toast.success("New supplier added 🎉");
+      }
+
+      setFormData({ supplier_name: "", contact_info: "" });
+      setEditingId(null);
+      setShowForm(false);
+      fetchSuppliers();
+    } catch (error) {
+      toast.error("Error saving supplier ❌");
+    }
   };
 
   const filtered = suppliers.filter((s) =>
-    s.supplier_name.toLowerCase().includes(searchTerm.toLowerCase())
+    s.supplierName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -160,8 +176,8 @@ const Suppliers = () => {
             {paginated.map((s) => (
               <tr key={s.id} className="border-t border-gray-600 hover:bg-gray-700 transition">
                 <td className="px-6 py-4">SUP{String(s.id).padStart(4, "0")}</td>
-                <td className="px-6 py-4">{s.supplier_name}</td>
-                <td className="px-6 py-4">{s.contact_info}</td>
+                <td className="px-6 py-4">{s.supplierName}</td>
+                <td className="px-6 py-4">{s.contactInfo}</td>
                 <td className="px-6 py-4 flex justify-center gap-4">
                   <button
                     onClick={() => handleEdit(s)}
