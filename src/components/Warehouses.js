@@ -1,21 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Warehouses = () => {
-  const [warehouses, setWarehouses] = useState([
-    {
-      id: 1,
-      warehouse_name: "Manhattan Main Warehouse",
-      location: "Manhattan, New York, USA",
-    },
-    {
-      id: 2,
-      warehouse_name: "Brooklyn Fulfillment Center",
-      location: "Brooklyn, New York, USA",
-    },
-  ]);
-
+  const [warehouses, setWarehouses] = useState([]);
   const [formData, setFormData] = useState({
     warehouse_name: "",
     location: "",
@@ -26,6 +15,27 @@ const Warehouses = () => {
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const token = localStorage.getItem("token");
+
+  // GET
+  useEffect(() => {
+    axios
+      .get("https://localhost:7080/api/warehouses", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        const mapped = res.data.map((item) => ({
+          id: item.id,
+          warehouse_name: item.warehouseName,
+          location: item.location,
+        }));
+        setWarehouses(mapped);
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        toast.error("Failed to load warehouses");
+      });
+  }, []);
 
   const handleEdit = (wh) => {
     setFormData({
@@ -36,35 +46,54 @@ const Warehouses = () => {
     setShowForm(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this warehouse?")) {
-      setWarehouses((prev) => prev.filter((w) => w.id !== id));
-      toast.success("Warehouse deleted 🗑");
+      try {
+        await axios.delete(`https://localhost:7080/api/warehouses/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setWarehouses((prev) => prev.filter((w) => w.id !== id));
+        toast.success("Warehouse deleted 🗑");
+      } catch {
+        toast.error("Delete failed ❌");
+      }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     const { warehouse_name, location } = formData;
+
     if (!warehouse_name || !location) {
       toast.error("Please fill in all fields ❌");
       return;
     }
 
-    if (editingId) {
-      const updated = warehouses.map((w) =>
-        w.id === editingId ? { ...w, ...formData } : w
-      );
-      setWarehouses(updated);
-      toast.success("Warehouse updated ✅");
-    } else {
-      const newWh = {
-        id: warehouses.length + 1,
-        ...formData,
-      };
-      setWarehouses([...warehouses, newWh]);
-      toast.success("New warehouse added 🎉");
+    try {
+      if (editingId) {
+        await axios.put(
+          `https://localhost:7080/api/warehouses/${editingId}`,
+          { warehouseName: warehouse_name, location },
+
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const updated = warehouses.map((w) =>
+          w.id === editingId ? { ...w, ...formData } : w
+        );
+        setWarehouses(updated);
+        toast.success("Warehouse updated ✅");
+      } else {
+        const res = await axios.post(
+          "https://localhost:7080/api/warehouses",
+         { warehouseName: warehouse_name, location },
+
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setWarehouses([...warehouses, res.data]);
+        toast.success("New warehouse added 🎉");
+      }
+    } catch {
+      toast.error("Save failed 😓");
     }
 
     setFormData({ warehouse_name: "", location: "" });
@@ -73,7 +102,7 @@ const Warehouses = () => {
   };
 
   const filtered = warehouses.filter((w) =>
-    w.warehouse_name.toLowerCase().includes(searchTerm.toLowerCase())
+    (w?.warehouse_name || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -91,7 +120,9 @@ const Warehouses = () => {
             setFormData({ warehouse_name: "", location: "" });
           }}
           className={`${
-            showForm ? "bg-green-600 hover:bg-red-700" : "bg-green-700 hover:bg-green-600"
+            showForm
+              ? "bg-green-600 hover:bg-red-700"
+              : "bg-green-700 hover:bg-green-600"
           } text-white font-semibold py-2 px-4 rounded`}
         >
           {showForm ? "✖ Close Form" : "+ Add Warehouse"}
@@ -153,7 +184,9 @@ const Warehouses = () => {
                 key={w.id}
                 className="border-t border-gray-700 hover:bg-gray-700 transition"
               >
-                <td className="px-6 py-4">WH{String(w.id).padStart(4, "0")}</td>
+                <td className="px-6 py-4">
+                  WH{String(w.id).padStart(4, "0")}
+                </td>
                 <td className="px-6 py-4">{w.warehouse_name}</td>
                 <td className="px-6 py-4">{w.location}</td>
                 <td className="px-6 py-4 flex gap-4">
