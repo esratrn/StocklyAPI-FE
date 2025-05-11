@@ -1,15 +1,55 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
+import axios from 'axios';
 
-let chartInstance = null; // dışarıda tanımla
+let chartInstance = null;
 
 function Dashboard() {
   const chartRef = useRef(null);
+  const [weeklyReport, setWeeklyReport] = useState([]);
+  const [stats, setStats] = useState({
+    totalStocks: 0,
+    totalCategories: 0,
+    totalHistory: 0,
+    todaysVisitors: 0,
+  });
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    axios.get("https://localhost:7080/api/dashboard", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then(res => {
+      setWeeklyReport(res.data.weeklyReport || []);
+      setStats({
+        totalStocks: res.data.totalStocks,
+        totalCategories: res.data.totalCategories,
+        totalHistory: res.data.totalHistory,
+        todaysVisitors: res.data.todaysVisitors
+      });
+    })
+    .catch(err => {
+      console.error("API error:", err);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!chartRef.current || weeklyReport.length === 0) return;
+
     const ctx = chartRef.current.getContext('2d');
 
-    // daha önce varsa yok et
+    const orderedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+    const dayToCount = {};
+    weeklyReport.forEach(item => {
+      dayToCount[item.day] = item.count;
+    });
+
+    const chartData = orderedDays.map(day => dayToCount[day] || 0);
+
     if (chartInstance) {
       chartInstance.destroy();
     }
@@ -17,10 +57,10 @@ function Dashboard() {
     chartInstance = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        labels: orderedDays,
         datasets: [{
           label: 'Stock Entries',
-          data: [12, 19, 3, 5, 2, 3, 7],
+          data: chartData,
           borderColor: '#BE123C',
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
           tension: 0.4,
@@ -33,35 +73,31 @@ function Dashboard() {
         }
       }
     });
-  }, []);
+  }, [weeklyReport]);
 
   return (
     <div className="bg-gray-400 min-h-screen text-white p-6 pt-16">
       <h1 className="text-3xl font-semibold text-white mb-6">Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        {/* Kartlar */}
-        {/* Kartlar */}
-<div className="bg-gray-500 p-6 rounded shadow">
-  <p className="text-base font-semibold text-purple-700">Total Stocks</p>
-  <p className="text-4xl font-bold mt-2 text-purple-700">7</p>
-</div>
-<div className="bg-gray-500 p-6 rounded shadow">
-  <p className="text-base font-semibold text-purple-700">Total History</p>
-  <p className="text-4xl font-bold mt-2 text-purple-700">3</p>
-</div>
-<div className="bg-gray-500 p-6 rounded shadow">
-  <p className="text-base font-semibold text-purple-700">Total Categories</p>
-  <p className="text-4xl font-bold mt-2 text-purple-700">3</p>
-</div>
-<div className="bg-gray-500 p-6 rounded shadow">
-  <p className="text-base font-semibold text-purple-700">Today's Visitors</p>
-  <p className="text-4xl font-bold mt-2 text-purple-700">1</p>
-</div>
-
+        <div className="bg-gray-500 p-6 rounded shadow">
+          <p className="text-base font-semibold text-purple-700">Total Stocks</p>
+          <p className="text-4xl font-bold mt-2 text-purple-700">{stats.totalStocks}</p>
+        </div>
+        <div className="bg-gray-500 p-6 rounded shadow">
+          <p className="text-base font-semibold text-purple-700">Total History</p>
+          <p className="text-4xl font-bold mt-2 text-purple-700">{stats.totalHistory}</p>
+        </div>
+        <div className="bg-gray-500 p-6 rounded shadow">
+          <p className="text-base font-semibold text-purple-700">Total Categories</p>
+          <p className="text-4xl font-bold mt-2 text-purple-700">{stats.totalCategories}</p>
+        </div>
+        <div className="bg-gray-500 p-6 rounded shadow">
+          <p className="text-base font-semibold text-purple-700">Today's Visitors</p>
+          <p className="text-4xl font-bold mt-2 text-purple-700">{stats.todaysVisitors}</p>
+        </div>
       </div>
 
-      {/* Grafik */}
       <div className="bg-gray-300 p-6 rounded shadow">
         <h2 className="text-xl font-semibold text-black mb-4">Weekly Stock Report</h2>
         <canvas ref={chartRef} height="100"></canvas>
