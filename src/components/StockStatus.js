@@ -51,4 +51,3 @@ const StockStatus = () => {
 };
 
 export default StockStatus;
-
