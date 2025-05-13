@@ -16,6 +16,10 @@ const PurchaseOrders = () => {
   const [editingOrderId, setEditingOrderId] = useState(null);
   const [editedStatus, setEditedStatus] = useState("Pending");
   const itemsPerPage = 5;
+  const [productId, setProductId] = useState("");
+const [warehouseId, setWarehouseId] = useState("");
+const [quantity, setQuantity] = useState("");
+
 
   useEffect(() => {
     fetchPurchaseOrders();
@@ -49,12 +53,15 @@ const PurchaseOrders = () => {
     }
 
     try {
-      await axios.post("https://localhost:7080/api/PurchaseOrders", {
-        supplierId: supplierIdValue,
-        orderDate: new Date(newDate).toISOString(),
-        price: priceValue,
-        status: newStatus,
-      });
+     await axios.post("https://localhost:7080/api/PurchaseOrders", {
+  supplierId: supplierIdValue,
+  orderDate: new Date(newDate).toISOString(),
+  price: priceValue,
+  status: newStatus,
+  productId: parseInt(productId),
+  warehouseId: parseInt(warehouseId),
+  quantity: parseInt(quantity)
+});
 
       toast.success("Purchase order added!");
       fetchPurchaseOrders();
@@ -141,6 +148,28 @@ const PurchaseOrders = () => {
             <option value="Completed">Completed</option>
             <option value="Cancelled">Cancelled</option>
           </select>
+          <input
+  type="number"
+  placeholder="Product ID"
+  value={productId}
+  onChange={(e) => setProductId(e.target.value)}
+  className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
+/>
+<input
+  type="number"
+  placeholder="Warehouse ID"
+  value={warehouseId}
+  onChange={(e) => setWarehouseId(e.target.value)}
+  className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
+/>
+<input
+  type="number"
+  placeholder="Quantity"
+  value={quantity}
+  onChange={(e) => setQuantity(e.target.value)}
+  className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
+/>
+
           <button
             type="submit"
             className="bg-green-700 hover:bg-green-600 px-4 py-2 rounded text-white font-semibold"

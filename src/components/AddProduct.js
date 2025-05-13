@@ -10,46 +10,47 @@ function AddProduct() {
 
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const normalizedCategory = category.trim().toLowerCase();
-    let categoryId = 0;
-    if (normalizedCategory === "electronics") {
-      categoryId = 1;
-    } else if (normalizedCategory === "office supplies") {
-      categoryId = 2;
-    } else if (normalizedCategory === "books") {
-      categoryId = 3;
-    } else {
-      alert("Unknown category: " + category);
-    }
+  const normalizedCategory = category.trim().toLowerCase();
+  let categoryId = 0;
+  if (normalizedCategory === "electronics") {
+    categoryId = 1;
+  } else if (normalizedCategory === "office supplies") {
+    categoryId = 2;
+  } else if (normalizedCategory === "books") {
+    categoryId = 3;
+  } else {
+    alert("Unknown category: " + category);
+  }
 
-    const product = {
-      productName: name,
-      categoryId: categoryId,
-      stockQuantity: parseInt(quantity),
-      price: parseFloat(price),
-      description: "optional desc"
-    };
-
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        "https://localhost:7080/api/Product",
-        product,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        }
-      );
-      alert('Product added!');
-    } catch (error) {
-      console.error(error);
-      alert('Failed to add product.');
-    }
+  const product = {
+    productName: name,
+    categoryId: categoryId,
+    stockQuantity: parseInt(quantity),
+    price: parseFloat(price),
+    warehouseId: parseInt(warehouseid), // ✅ EKLENDİ
+    description: "optional desc"
   };
+
+  try {
+    const token = localStorage.getItem('token');
+    await axios.post(
+      "https://localhost:7080/api/Product",
+      product,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
+    alert('Product added!');
+  } catch (error) {
+    console.error(error);
+    alert('Failed to add product.');
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-400">

@@ -15,6 +15,10 @@ const SalesOrders = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const token = localStorage.getItem("token");
+  const [productId, setProductId] = useState("");
+const [warehouseId, setWarehouseId] = useState("");
+const [quantity, setQuantity] = useState("");
+
 
   useEffect(() => {
     fetchSalesOrders();
@@ -46,17 +50,20 @@ const SalesOrders = () => {
 
     try {
       const response = await axios.post(
-        "https://localhost:7080/api/SalesOrders",
-        {
-          userId: 1,
-          orderDate: newDate,
-          status: newStatus,
-          price: priceNumber,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+  "https://localhost:7080/api/SalesOrders",
+  {
+    userId: 1,
+    orderDate: newDate,
+    status: newStatus,
+    price: priceNumber,
+    productId: parseInt(productId),
+    warehouseId: parseInt(warehouseId),
+    quantity: parseInt(quantity)
+  },
+  {
+    headers: { Authorization: `Bearer ${token}` },
+  }
+);
 
       setSalesData([response.data, ...salesData]);
       setNewPrice("");
@@ -149,6 +156,28 @@ const SalesOrders = () => {
             <option value="Cancelled">Cancelled</option>
             <option value="Delivered">Delivered</option>
           </select>
+          <input
+  type="number"
+  placeholder="Product ID"
+  value={productId}
+  onChange={(e) => setProductId(e.target.value)}
+  className="w-full md:w-1/4 p-2 rounded bg-gray-600 text-white border border-gray-600"
+/>
+<input
+  type="number"
+  placeholder="Warehouse ID"
+  value={warehouseId}
+  onChange={(e) => setWarehouseId(e.target.value)}
+  className="w-full md:w-1/4 p-2 rounded bg-gray-600 text-white border border-gray-600"
+/>
+<input
+  type="number"
+  placeholder="Quantity"
+  value={quantity}
+  onChange={(e) => setQuantity(e.target.value)}
+  className="w-full md:w-1/4 p-2 rounded bg-gray-600 text-white border border-gray-600"
+/>
+
           <button
             type="submit"
             className="bg-green-700 hover:bg-green-600 px-4 py-2 rounded text-white font-semibold"
