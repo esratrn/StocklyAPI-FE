@@ -6,6 +6,8 @@ function AddProduct() {
   const [category, setCategory] = useState('');
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
+  const [warehouseid, setWarehouseid] = useState('');
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,6 +80,21 @@ function AddProduct() {
               onChange={(e) => setQuantity(e.target.value)}
               className="w-full px-3 py-1 bg-gray-100 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
               placeholder="0"
+              min="0"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="warehouse" className="text-sm text-gray-700 block mb-1 font-medium">Warehouse Id</label>
+            <input
+              type="number"
+              name="warehouseid"
+              id="warehouse"
+              value={warehouseid}
+              onChange={(e) => setWarehouseid(e.target.value)}
+              className="w-full px-3 py-1 bg-gray-100 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+              placeholder="0"
+              min="0"
               required
             />
           </div>

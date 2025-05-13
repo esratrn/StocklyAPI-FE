@@ -81,20 +81,20 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
         <div className="bg-gray-500 p-6 rounded shadow">
-          <p className="text-base font-semibold text-purple-700">Total Stocks</p>
-          <p className="text-4xl font-bold mt-2 text-purple-700">{stats.totalStocks}</p>
+          <p className="text-base font-semibold text-white">Total Stocks</p>
+          <p className="text-4xl font-bold mt-2 text-white">{stats.totalStocks}</p>
         </div>
         <div className="bg-gray-500 p-6 rounded shadow">
-          <p className="text-base font-semibold text-purple-700">Total History</p>
-          <p className="text-4xl font-bold mt-2 text-purple-700">{stats.totalHistory}</p>
+          <p className="text-base font-semibold text-white">Total History</p>
+          <p className="text-4xl font-bold mt-2 text-white">{stats.totalHistory}</p>
         </div>
         <div className="bg-gray-500 p-6 rounded shadow">
-          <p className="text-base font-semibold text-purple-700">Total Categories</p>
-          <p className="text-4xl font-bold mt-2 text-purple-700">{stats.totalCategories}</p>
+          <p className="text-base font-semibold text-white">Total Categories</p>
+          <p className="text-4xl font-bold mt-2 text-white">{stats.totalCategories}</p>
         </div>
         <div className="bg-gray-500 p-6 rounded shadow">
-          <p className="text-base font-semibold text-purple-700">Today's Visitors</p>
-          <p className="text-4xl font-bold mt-2 text-purple-700">{stats.todaysVisitors}</p>
+          <p className="text-base font-semibold text-white">Today's Visitors</p>
+          <p className="text-4xl font-bold mt-2 text-white">{stats.todaysVisitors}</p>
         </div>
       </div>
 

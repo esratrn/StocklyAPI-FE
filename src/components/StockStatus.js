@@ -3,6 +3,11 @@ import axios from 'axios';
 
 const StockStatus = () => {
     const [stockData, setStockData] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 10;
+const totalPages = Math.ceil(stockData.length / itemsPerPage);
+
+
 
     useEffect(() => {
         axios.get('https://localhost:7080/api/Product/stock-status', {
@@ -45,8 +50,28 @@ const StockStatus = () => {
                         ))}
                     </tbody>
                 </table>
+                <div className="flex justify-center mt-6 space-x-4">
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(currentPage - 1)}
+          className="bg-green-700 text-white px-4 py-2 rounded disabled:opacity-40"
+        >
+          ← Previous
+        </button>
+        <span className="px-4 py-2 text-sm">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(currentPage + 1)}
+          className="bg-green-700 text-white px-4 py-2 rounded disabled:opacity-40"
+        >
+          Next →
+        </button>
+      </div>
             </div>
         </div>
+        
     );
 };
 

@@ -13,9 +13,14 @@ const handleLogout = () => {
   navigate('/login');
 };
     return (
-        <nav style={{ backgroundColor: '#BE123C' }} className=" text-white fixed top-0 w-full z-50">
-          <div className="container mx-auto flex items-center justify-between px-4 py-3">
-            <a className="text-lg font-semibold" href="/#">STOCKLY</a>
+      <nav style={{ backgroundColor: '#BE123C' }} className="text-white fixed top-0 w-full z-50">
+      <div className="container mx-auto flex items-center justify-between px-4 py-3">
+        <a className="text-lg font-semibold flex items-center gap-2" href="/#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
+</svg>
+          STOCKLY
+        </a>
             <button
               className="text-white focus:outline-none"
               onClick={() =>
@@ -119,9 +124,10 @@ const handleLogout = () => {
                     <button className="hover:text-gray-300 font-medium cursor-pointer">Dropdown ▼</button>
                     <ul className="ml-4 mt-1 hidden group-hover:block">
                     <Link to="/notifications">Notifications</Link>
-                      <li><a className="hover:text-gray-300 block" href="/#">Profile</a></li>
+                      <li><Link to="/userprofile">Profile</Link></li>
                       <li><hr className="border-gray-600 my-2" /></li>
                       <li>
+                  
   <button
     onClick={handleLogout}
     className="hover:text-gray-300 block w-full text-left"
