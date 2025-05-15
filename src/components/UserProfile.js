@@ -1,14 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const UserProfile = () => {
   const [user, setUser] = useState({
-    name: "Jessica Jones",
-    email: "jessica.jones@example.com",
-    role: "Admin",
+    name: "",
+    lastName: "",
+    email: "",
+    roleName: ""
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(user);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("https://localhost:7080/api/Users/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setUser(response.data);
+        setFormData(response.data);
+      } catch (error) {
+        console.error("Profile fetch failed:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,6 +38,7 @@ const UserProfile = () => {
   const handleSave = () => {
     setUser(formData);
     setIsEditing(false);
+    // Güncelleme API isteği yazılabilir (isteğe bağlı)
   };
 
   return (
@@ -38,12 +60,14 @@ const UserProfile = () => {
                 />
               </svg>
             </div>
-            <h1 className="mt-6 text-2xl font-semibold text-gray-800">{user.name}</h1>
+            <h1 className="mt-6 text-2xl font-semibold text-gray-800">
+              {user.name} {user.lastName}
+            </h1>
             <p className="text-gray-500 mt-2">{user.email}</p>
             <p className="mt-4 text-sm text-gray-700">
               Role:{" "}
               <span className="bg-rose-600 text-white px-3 py-1 rounded-full">
-                {user.role}
+                {user.roleName}
               </span>
             </p>
             <button
@@ -63,7 +87,15 @@ const UserProfile = () => {
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
-                placeholder="Full Name"
+                placeholder="First Name"
+              />
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                placeholder="Last Name"
               />
               <input
                 type="email"
@@ -75,8 +107,8 @@ const UserProfile = () => {
               />
               <input
                 type="text"
-                name="role"
-                value={formData.role}
+                name="roleName"
+                value={formData.roleName}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
                 placeholder="Role"

@@ -5,25 +5,38 @@ const StockStatus = () => {
     const [stockData, setStockData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-
     const [searchTerm, setSearchTerm] = useState('');
     const [hideZeroStock, setHideZeroStock] = useState(false);
+    const token = localStorage.getItem("token");
+    console.log("Stored token:", localStorage.getItem("token"));
 
-    useEffect(() => {
-        axios.get('https://localhost:7080/api/Product/stock-status', {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-        })
-        .then(response => {
-            setStockData(response.data);
-        })
-        .catch(error => {
-            console.error('Error fetching stock status:', error);
-        });
-    }, []);
 
-    // 🔍 Arama ve filtre uygulaması
+useEffect(() => {
+  const rawToken = localStorage.getItem('token');
+  if (!rawToken) {
+    console.error("No token found.");
+    return;
+  }
+
+  const token = rawToken.trim(); // 🔧 ÖNEMLİ: Fazla boşluk varsa temizler
+
+  console.log("Stored token:", token);
+
+  axios.get('https://localhost:7080/api/Product/stock-status', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  .then(response => {
+    setStockData(response.data);
+  })
+  .catch(error => {
+    console.error('Error fetching stock status:', error);
+  });
+}, []);
+
+
+
     const filteredData = stockData
         .filter(item =>
             item.productName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -34,12 +47,9 @@ const StockStatus = () => {
 
     return (
         <div className="min-h-screen bg-gray-400 text-white p-8 pt-16">
-            <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
-                <h1 className="text-3xl font-bold">Stock Status</h1>
-            </div>
+            <h1 className="text-3xl font-bold mb-6">Stock Status</h1>
 
-            {/* 🔍 Arama inputu */}
-            <div className="flex flex-col md:flex-row items-center justify-between  mb-4 gap-4">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
                 <input
                     type="text"
                     placeholder="Search by product name..."
@@ -50,8 +60,6 @@ const StockStatus = () => {
                     }}
                     className="px-4 py-2 text-black bg-gray-600 border-gray-600 rounded w-full md:w-1/3"
                 />
-
-                {/* ✅ Sıfır stokları gizle/göster */}
                 <label className="flex items-center gap-2 text-sm">
                     <input
                         type="checkbox"
@@ -71,7 +79,7 @@ const StockStatus = () => {
                     <thead className="bg-gray-700 text-left text-sm uppercase tracking-wider">
                         <tr>
                             <th className="px-6 py-3">Product Name</th>
-                            <th className="px-6 py-3">Warehouse ID</th>
+                            <th className="px-6 py-3">Warehouse</th>
                             <th className="px-6 py-3">Current Quantity</th>
                             <th className="px-6 py-3">Date</th>
                         </tr>
@@ -82,7 +90,7 @@ const StockStatus = () => {
                             .map((item, index) => (
                                 <tr key={index} className="border-t border-gray-600 hover:bg-gray-700 transition">
                                     <td className="px-6 py-4">{item.productName}</td>
-                                    <td className="px-6 py-4">{item.warehouseId}</td>
+                                    <td className="px-6 py-4">{item.warehouseName}</td>
                                     <td className="px-6 py-4">{item.currentQuantity}</td>
                                     <td className="px-6 py-4">{new Date(item.date).toLocaleString()}</td>
                                 </tr>
@@ -91,7 +99,6 @@ const StockStatus = () => {
                     </tbody>
                 </table>
 
-                {/* 📄 Sayfalama kontrolü */}
                 <div className="flex justify-center mt-6 space-x-4">
                     <button
                         disabled={currentPage === 1}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
@@ -34,16 +34,41 @@ const Notification = ({ type = "info", message }) => {
   );
 };
 
-// Örnek kullanım (App)
-const App = () => {
+// API'den veri çeken versiyon
+const Notifications = () => {
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("https://localhost:7080/api/Notifications", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        setNotifications(data);
+      } catch (error) {
+        console.error("Bildirimler alınamadı:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
   return (
     <div className="space-y-4 p-8 pt-16 min-h-screen bg-gray-500">
-      <Notification type="success" message="✅ Yeni ürün başarıyla eklendi." />
-      <Notification type="warning" message="⚠️ Stok seviyesi düşük." />
-      <Notification type="danger" message="❌ Ürünün stoğu tükendi!" />
-      <Notification type="info" message="ℹ️ Ürün bilgisi güncellendi." />
+      {notifications.length === 0 ? (
+        <p className="text-white">Hiç bildirim yok.</p>
+      ) : (
+        notifications.map((n) => (
+          <Notification key={n.id} type={n.type} message={n.message} />
+        ))
+      )}
     </div>
   );
 };
 
-export default App;
+export default Notifications;
+

@@ -18,22 +18,52 @@ const SalesOrders = () => {
   const [productId, setProductId] = useState("");
 const [warehouseId, setWarehouseId] = useState("");
 const [quantity, setQuantity] = useState("");
+const [products, setProducts] = useState([]);
+const [warehouses, setWarehouses] = useState([]);
 
 
-  useEffect(() => {
-    fetchSalesOrders();
-  }, []);
 
   const fetchSalesOrders = async () => {
-    try {
-      const response = await axios.get("https://localhost:7080/api/SalesOrders", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setSalesData(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch sales orders.");
-    }
-  };
+  try {
+    const response = await axios.get("https://localhost:7080/api/SalesOrders", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setSalesData(response.data);
+  } catch (error) {
+    toast.error("Failed to fetch sales orders.");
+  }
+};
+
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get("https://localhost:7080/api/Product/all", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setProducts(response.data);
+  } catch (error) {
+    toast.error("Failed to fetch products.");
+  }
+};
+const fetchWarehouses = async () => {
+  try {
+    const response = await axios.get("https://localhost:7080/api/Warehouse/all", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setWarehouses(response.data);
+  } catch (error) {
+    toast.error("Failed to fetch warehouses ❌");
+  }
+};
+
+
+// ⬇️ Tanımlar bittikten sonra:
+useEffect(() => {
+  fetchSalesOrders();
+  fetchProducts();
+  fetchWarehouses();
+}, []);
+
+
 
   const handleAddOrder = async (e) => {
     e.preventDefault();
@@ -156,20 +186,32 @@ const [quantity, setQuantity] = useState("");
             <option value="Cancelled">Cancelled</option>
             <option value="Delivered">Delivered</option>
           </select>
-          <input
-  type="number"
-  placeholder="Product ID"
+          <select
   value={productId}
   onChange={(e) => setProductId(e.target.value)}
   className="w-full md:w-1/4 p-2 rounded bg-gray-600 text-white border border-gray-600"
-/>
-<input
-  type="number"
-  placeholder="Warehouse ID"
+>
+  <option value="">Select Product</option>
+  {products.map((p) => (
+    <option key={p.id} value={p.id}>
+      {p.productName}
+    </option>
+  ))}
+</select>
+
+<select
   value={warehouseId}
   onChange={(e) => setWarehouseId(e.target.value)}
   className="w-full md:w-1/4 p-2 rounded bg-gray-600 text-white border border-gray-600"
-/>
+>
+  <option value="">Select Warehouse</option>
+  {warehouses.map((w) => (
+    <option key={w.id} value={w.id}>
+      {w.warehouseName}
+    </option>
+  ))}
+</select>
+
 <input
   type="number"
   placeholder="Quantity"

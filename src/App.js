@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import axios from 'axios'; // ✅ Ekledik
 import Navbar from './components/Navbar';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -13,6 +14,11 @@ import Suppliers from './components/Suppliers';
 import Notifications from './components/Notifications';
 import UserProfile from './components/UserProfile';
 
+// ✅ Token'ı global olarak axios'a tanıt
+const token = localStorage.getItem('token');
+if (token) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token.trim()}`;
+}
 
 function AppContent() {
   const location = useLocation();
@@ -49,3 +55,4 @@ export default function App() {
     </Router>
   );
 }
+

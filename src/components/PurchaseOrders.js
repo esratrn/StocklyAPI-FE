@@ -19,13 +19,13 @@ const PurchaseOrders = () => {
   const [productId, setProductId] = useState("");
 const [warehouseId, setWarehouseId] = useState("");
 const [quantity, setQuantity] = useState("");
+const [products, setProducts] = useState([]);
+const [warehouses, setWarehouses] = useState([]);
+const token = localStorage.getItem("token");
 
 
-  useEffect(() => {
-    fetchPurchaseOrders();
-  }, []);
 
-  const fetchPurchaseOrders = async () => {
+const fetchPurchaseOrders = async () => {
     try {
       const response = await axios.get("https://localhost:7080/api/PurchaseOrders");
       setPurchaseData(response.data);
@@ -34,6 +34,39 @@ const [quantity, setQuantity] = useState("");
       toast.error("Failed to load purchase orders ❌");
     }
   };
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get("https://localhost:7080/api/Product/all", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
+    setProducts(response.data);
+  } catch (error) {
+    console.error("Product fetch failed: ", error);
+    toast.error("Failed to load products ❌");
+  }
+};
+const fetchWarehouses = async () => {
+  try {
+    const response = await axios.get("https://localhost:7080/api/Warehouse/all", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setWarehouses(response.data);
+  } catch (error) {
+    toast.error("Failed to fetch warehouses ❌");
+  }
+};
+
+
+
+  useEffect(() => {
+  fetchPurchaseOrders();
+  fetchProducts(); 
+  fetchWarehouses();
+}, []);
+
+  
 
   const handleAddOrder = async (e) => {
     e.preventDefault();
@@ -148,20 +181,32 @@ const [quantity, setQuantity] = useState("");
             <option value="Completed">Completed</option>
             <option value="Cancelled">Cancelled</option>
           </select>
-          <input
-  type="number"
-  placeholder="Product ID"
+         <select
   value={productId}
   onChange={(e) => setProductId(e.target.value)}
   className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
-/>
-<input
-  type="number"
-  placeholder="Warehouse ID"
+>
+  <option value="">Select Product</option>
+  {products.map((p) => (
+    <option key={p.id} value={p.id}>
+      {p.productName}
+    </option>
+  ))}
+</select>
+
+<select
   value={warehouseId}
   onChange={(e) => setWarehouseId(e.target.value)}
-  className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
-/>
+  className="w-full md:w-1/4 p-2 rounded bg-gray-600 text-white border border-gray-600"
+>
+  <option value="">Select Warehouse</option>
+  {warehouses.map((w) => (
+    <option key={w.id} value={w.id}>
+      {w.warehouseName}
+    </option>
+  ))}
+</select>
+
 <input
   type="number"
   placeholder="Quantity"
