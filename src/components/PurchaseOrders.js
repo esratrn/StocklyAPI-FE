@@ -7,101 +7,99 @@ const PurchaseOrders = () => {
   const [purchaseData, setPurchaseData] = useState([]);
   const [newSupplierId, setNewSupplierId] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [newPrice, setNewPrice] = useState("");
   const [newDate, setNewDate] = useState("");
+  const [newPrice, setNewPrice] = useState("");
   const [newStatus, setNewStatus] = useState("Pending");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [editingOrderId, setEditingOrderId] = useState(null);
   const [editedStatus, setEditedStatus] = useState("Pending");
+  const [showForm, setShowForm] = useState(false);
   const itemsPerPage = 5;
+
   const [productId, setProductId] = useState("");
-const [warehouseId, setWarehouseId] = useState("");
-const [quantity, setQuantity] = useState("");
-const [products, setProducts] = useState([]);
-const [warehouses, setWarehouses] = useState([]);
-const token = localStorage.getItem("token");
+  const [warehouseId, setWarehouseId] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [products, setProducts] = useState([]);
+  const [warehouses, setWarehouses] = useState([]);
+  const token = localStorage.getItem("token");
 
-
-
-const fetchPurchaseOrders = async () => {
+  const fetchPurchaseOrders = async () => {
     try {
       const response = await axios.get("https://localhost:7080/api/PurchaseOrders");
-      setPurchaseData(response.data);
+      const sorted = response.data.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+    setPurchaseData(sorted);
+   
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
       toast.error("Failed to load purchase orders ❌");
     }
   };
-const fetchProducts = async () => {
-  try {
-    const response = await axios.get("https://localhost:7080/api/Product/all", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
-    });
-    setProducts(response.data);
-  } catch (error) {
-    console.error("Product fetch failed: ", error);
-    toast.error("Failed to load products ❌");
-  }
-};
-const fetchWarehouses = async () => {
-  try {
-    const response = await axios.get("https://localhost:7080/api/Warehouse/all", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setWarehouses(response.data);
-  } catch (error) {
-    toast.error("Failed to fetch warehouses ❌");
-  }
-};
 
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get("https://localhost:7080/api/Product/all", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Product fetch failed: ", error);
+      toast.error("Failed to load products ❌");
+    }
+  };
 
+  const fetchWarehouses = async () => {
+    try {
+      const response = await axios.get("https://localhost:7080/api/Warehouse/all", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setWarehouses(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch warehouses ❌");
+    }
+  };
 
   useEffect(() => {
-  fetchPurchaseOrders();
-  fetchProducts(); 
-  fetchWarehouses();
-}, []);
-
-  
+    fetchPurchaseOrders();
+    fetchProducts();
+    fetchWarehouses();
+  }, []);
 
   const handleAddOrder = async (e) => {
     e.preventDefault();
-
     const supplierIdValue = parseInt(newSupplierId);
     const priceValue = parseFloat(newPrice);
+  
 
-    if (
-      isNaN(supplierIdValue) ||
-      supplierIdValue < 0 ||
-      isNaN(priceValue) ||
-      priceValue < 0 ||
-      !newDate
-    ) {
+    if (isNaN(supplierIdValue) || supplierIdValue < 0 || isNaN(priceValue) || priceValue < 0){
+
       toast.error("Please enter valid Supplier ID, Price, and Date.");
       return;
     }
 
     try {
-     await axios.post("https://localhost:7080/api/PurchaseOrders", {
-  supplierId: supplierIdValue,
-  orderDate: new Date(newDate).toISOString(),
-  price: priceValue,
-  status: newStatus,
-  productId: parseInt(productId),
-  warehouseId: parseInt(warehouseId),
-  quantity: parseInt(quantity)
-});
+      await axios.post("https://localhost:7080/api/PurchaseOrders", {
+        supplierId: supplierIdValue,
+        orderDate: new Date().toISOString(),
+        price: priceValue,
+        status: newStatus,
+        productId: parseInt(productId),
+        warehouseId: parseInt(warehouseId),
+        quantity: parseInt(quantity)
+      });
 
       toast.success("Purchase order added!");
       fetchPurchaseOrders();
+      setCurrentPage(1);
       setNewSupplierId("");
       setNewPrice("");
       setNewDate("");
       setNewStatus("Pending");
+      setProductId("");
+      setWarehouseId("");
+      setQuantity("");
+      setShowForm(false);
     } catch (error) {
       console.error("Error adding purchase order:", error);
       toast.error("Failed to add purchase order ❌");
@@ -126,9 +124,7 @@ const fetchWarehouses = async () => {
     }
   };
 
-  const sortedData = [...purchaseData].sort(
-    (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
-  );
+  const sortedData = [...purchaseData].sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
 
   const filteredData = sortedData.filter(
     (order) =>
@@ -138,91 +134,22 @@ const fetchWarehouses = async () => {
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredData.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
+  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="min-h-screen w-full bg-gray-400 text-white p-8 pt-16">
-      <h1 className="text-3xl font-bold mb-6">Purchase Orders</h1>
+      <div className="flex justify-between items center mb-6">
+      <h1 className="text-3xl font-bold">Purchase Orders</h1>
+      
 
-      <form onSubmit={handleAddOrder} className="bg-gray-700 p-4 rounded mb-6 space-y-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <input
-            type="number"
-            placeholder="Supplier ID"
-            min="0"
-            value={newSupplierId}
-            onChange={(e) => setNewSupplierId(e.target.value)}
-            className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
-          />
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="Price"
-            value={newPrice}
-            onChange={(e) => setNewPrice(e.target.value)}
-            className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
-          />
-          <input
-            type="datetime-local"
-            value={newDate}
-            onChange={(e) => setNewDate(e.target.value)}
-            className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/3"
-          />
-          <select
-            value={newStatus}
-            onChange={(e) => setNewStatus(e.target.value)}
-            className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
-          >
-            <option value="Pending">Pending</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-         <select
-  value={productId}
-  onChange={(e) => setProductId(e.target.value)}
-  className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
->
-  <option value="">Select Product</option>
-  {products.map((p) => (
-    <option key={p.id} value={p.id}>
-      {p.productName}
-    </option>
-  ))}
-</select>
-
-<select
-  value={warehouseId}
-  onChange={(e) => setWarehouseId(e.target.value)}
-  className="w-full md:w-1/4 p-2 rounded bg-gray-600 text-white border border-gray-600"
->
-  <option value="">Select Warehouse</option>
-  {warehouses.map((w) => (
-    <option key={w.id} value={w.id}>
-      {w.warehouseName}
-    </option>
-  ))}
-</select>
-
-<input
-  type="number"
-  placeholder="Quantity"
-  value={quantity}
-  onChange={(e) => setQuantity(e.target.value)}
-  className="p-2 rounded bg-gray-600 text-white border border-gray-600 w-full md:w-1/4"
-/>
-
-          <button
-            type="submit"
-            className="bg-green-700 hover:bg-green-600 px-4 py-2 rounded text-white font-semibold"
-          >
-            Add
-          </button>
-        </div>
-      </form>
+      
+        <button
+          onClick={() => setShowForm(true)}
+          className="bg-green-700 hover:bg-green-600 px-4 py-2 rounded text-white font-semibold"
+        >
+          + Add Purchase Order
+        </button>
+      </div>
 
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <input
@@ -241,7 +168,6 @@ const fetchWarehouses = async () => {
           <option value="Pending">Pending</option>
           <option value="Completed">Completed</option>
           <option value="Cancelled">Cancelled</option>
-          
         </select>
       </div>
 
@@ -259,10 +185,7 @@ const fetchWarehouses = async () => {
           </thead>
           <tbody>
             {paginatedData.map((order) => (
-              <tr
-                key={order.id}
-                className="border-t border-gray-600 hover:bg-gray-700 transition"
-              >
+              <tr key={order.id} className="border-t border-gray-600 hover:bg-gray-700 transition">
                 <td className="px-6 py-4">PO{String(order.id).padStart(4, "0")}</td>
                 <td className="px-6 py-4">{order.supplierId}</td>
                 <td className="px-6 py-4">
@@ -341,9 +264,7 @@ const fetchWarehouses = async () => {
         >
           ← Previous
         </button>
-        <span className="px-4 py-2 text-sm">
-          Page {currentPage} of {totalPages}
-        </span>
+        <span className="px-4 py-2 text-sm">Page {currentPage} of {totalPages}</span>
         <button
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage(currentPage + 1)}
@@ -352,6 +273,91 @@ const fetchWarehouses = async () => {
           Next →
         </button>
       </div>
+
+      {showForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-gray-800 p-6 rounded-lg w-full max-w-4xl">
+            <h2 className="text-xl font-semibold mb-4 text-white">Add Purchase Order</h2>
+            <form onSubmit={handleAddOrder} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <input
+                  type="number"
+                  placeholder="Supplier ID"
+                  min="0"
+                  value={newSupplierId}
+                  onChange={(e) => setNewSupplierId(e.target.value)}
+                  className="p-2 rounded bg-gray-600 text-white border border-gray-600"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Price"
+                  value={newPrice}
+                  onChange={(e) => setNewPrice(e.target.value)}
+                  className="p-2 rounded bg-gray-600 text-white border border-gray-600"
+                />
+              
+                <select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="p-2 rounded bg-gray-600 text-white border border-gray-600"
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+                <select
+                  value={productId}
+                  onChange={(e) => setProductId(e.target.value)}
+                  className="p-2 rounded bg-gray-600 text-white border border-gray-600"
+                >
+                  <option value="">Select Product</option>
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.productName}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={warehouseId}
+                  onChange={(e) => setWarehouseId(e.target.value)}
+                  className="p-2 rounded bg-gray-600 text-white border border-gray-600"
+                >
+                  <option value="">Select Warehouse</option>
+                  {warehouses.map((w) => (
+                    <option key={w.id} value={w.id}>
+                      {w.warehouseName}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="number"
+                  placeholder="Quantity"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  className="p-2 rounded bg-gray-600 text-white border border-gray-600"
+                />
+              </div>
+              <div className="flex justify-end gap-4 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-green-700 hover:bg-green-600 px-4 py-2 rounded text-white font-semibold"
+                >
+                  Add Order
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <ToastContainer position="top-right" autoClose={3000} />
     </div>

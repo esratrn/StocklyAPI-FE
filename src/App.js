@@ -13,6 +13,7 @@ import Warehouses from './components/Warehouses';
 import Suppliers from './components/Suppliers';
 import Notifications from './components/Notifications';
 import UserProfile from './components/UserProfile';
+import ProductList from './components/ProductList';
 
 // ✅ Token'ı global olarak axios'a tanıt
 const token = localStorage.getItem('token');
@@ -39,6 +40,7 @@ function AppContent() {
           <Route path="/warehouses" element={<Warehouses />} />
           <Route path="/stock-status" element={<StockStatus />} />
           <Route path="/purchase-orders" element={<PurchaseOrders />} />
+          <Route path="/product-list" element={<ProductList />} />
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/userprofile" element={<UserProfile />} />

@@ -1,10 +1,26 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+
 
 
 function Navbar() {
     const navigate = useNavigate();
+
+    const sidebarRef = useRef(null);
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    const sidebar = sidebarRef.current;
+    if (sidebar && !sidebar.contains(event.target)) {
+      sidebar.classList.add('translate-x-full');
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => document.removeEventListener('mousedown', handleClickOutside);
+}, []);
 
 const handleLogout = () => {
   // (Varsa) kullanıcı oturum verilerini temizle
@@ -38,6 +54,7 @@ const handleLogout = () => {
             </button>
             <div
             style={{ backgroundColor: '#9F0F34' }}
+              ref={sidebarRef}
               id="offcanvasDarkNavbar"
               className="fixed top-0 right-0 w-72 h-full bg-slate-800 text-white transform translate-x-full transition-transform duration-300 ease-in-out shadow-lg"
             >
@@ -61,9 +78,10 @@ const handleLogout = () => {
 
 <li>
   <Link to="/dashboard" className="hover:text-gray-300 font-medium flex items-center gap-1" >
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-house-heart" viewBox="0 0 16 16">
-      <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.707L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.646a.5.5 0 0 0 .708-.707L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
-    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-heart-fill" viewBox="0 0 16 16">
+  <path d="M7.293 1.5a1 1 0 0 1 1.414 0L11 3.793V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v3.293l2.354 2.353a.5.5 0 0 1-.708.707L8 2.207 1.354 8.853a.5.5 0 1 1-.708-.707z"/>
+  <path d="m14 9.293-6-6-6 6V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5zm-6-.811c1.664-1.673 5.825 1.254 0 5.018-5.825-3.764-1.664-6.691 0-5.018"/>
+</svg>
     Home
   </Link>
 </li>
@@ -76,6 +94,16 @@ const handleLogout = () => {
     Add Product
   </Link>
 </li>
+
+<li>
+  <Link to="/product-list" className="hover:text-gray-300 font-medium flex items-center gap-1">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bag-heart" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0M14 14V5H2v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1M8 7.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132"/>
+</svg>
+    Product List
+  </Link>
+</li>
+
 
 <li>
   <Link to="/stock-status" className="hover:text-gray-300 font-medium flex items-center gap-1" >
