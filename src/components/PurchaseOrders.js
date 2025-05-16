@@ -7,8 +7,6 @@ const PurchaseOrders = () => {
   const [purchaseData, setPurchaseData] = useState([]);
   const [newSupplierId, setNewSupplierId] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [newDate, setNewDate] = useState("");
-  const [newPrice, setNewPrice] = useState("");
   const [newStatus, setNewStatus] = useState("Pending");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -69,32 +67,28 @@ const PurchaseOrders = () => {
   const handleAddOrder = async (e) => {
     e.preventDefault();
     const supplierIdValue = parseInt(newSupplierId);
-    const priceValue = parseFloat(newPrice);
-  
+    if (isNaN(supplierIdValue) || supplierIdValue < 0 || !productId || !warehouseId || !quantity) {
+  toast.error("Please fill in all fields.");
+  return;
+}
 
-    if (isNaN(supplierIdValue) || supplierIdValue < 0 || isNaN(priceValue) || priceValue < 0){
-
-      toast.error("Please enter valid Supplier ID, Price, and Date.");
-      return;
-    }
 
     try {
       await axios.post("https://localhost:7080/api/PurchaseOrders", {
-        supplierId: supplierIdValue,
-        orderDate: new Date().toISOString(),
-        price: priceValue,
-        status: newStatus,
-        productId: parseInt(productId),
-        warehouseId: parseInt(warehouseId),
-        quantity: parseInt(quantity)
-      });
+  supplierId: supplierIdValue,
+  status: newStatus,
+  productId: parseInt(productId),
+  warehouseId: parseInt(warehouseId),
+  quantity: parseInt(quantity)
+}, {
+  headers: { Authorization: `Bearer ${token}` }
+});
+
 
       toast.success("Purchase order added!");
       fetchPurchaseOrders();
       setCurrentPage(1);
       setNewSupplierId("");
-      setNewPrice("");
-      setNewDate("");
       setNewStatus("Pending");
       setProductId("");
       setWarehouseId("");
@@ -288,15 +282,7 @@ const PurchaseOrders = () => {
                   onChange={(e) => setNewSupplierId(e.target.value)}
                   className="p-2 rounded bg-gray-600 text-white border border-gray-600"
                 />
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Price"
-                  value={newPrice}
-                  onChange={(e) => setNewPrice(e.target.value)}
-                  className="p-2 rounded bg-gray-600 text-white border border-gray-600"
-                />
+                
               
                 <select
                   value={newStatus}

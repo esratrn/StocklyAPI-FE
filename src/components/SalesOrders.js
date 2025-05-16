@@ -5,7 +5,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 const SalesOrders = () => {
   const [salesData, setSalesData] = useState([]);
-  const [newPrice, setNewPrice] = useState("");
   const [newDate, setNewDate] = useState("");
   const [newStatus, setNewStatus] = useState("Pending");
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,6 +20,8 @@ const SalesOrders = () => {
   const [products, setProducts] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [newPrice, setNewPrice] = useState("");
+
 
   const fetchSalesOrders = async () => {
     try {
@@ -60,31 +61,37 @@ const SalesOrders = () => {
     fetchProducts();
     fetchWarehouses();
   }, []);
+  useEffect(() => {
+  if (productId && quantity) {
+    const selectedProduct = products.find(p => p.id === parseInt(productId));
+    if (selectedProduct) {
+      const total = selectedProduct.price * parseInt(quantity || 0);
+      setNewPrice(total.toFixed(2)); // otomatik fiyat yazdır
+    } else {
+      setNewPrice("");
+    }
+  } 
+}, [productId, quantity, products]);
 
  const handleAddOrder = async (e) => {
   e.preventDefault();
-  if (!newPrice || !productId || !warehouseId || !quantity) {
-    toast.error("Please fill in all fields.");
-    return;
-  }
+ if (!productId || !warehouseId || !quantity) {
+  toast.error("Please fill in all fields.");
+  return;
+}
 
-  const priceNumber = parseFloat(newPrice.replace(",", "."));
-  if (isNaN(priceNumber)) {
-    toast.error("Please enter a valid price.");
-    return;
-  }
 
+  
   try {
     const response = await axios.post(
       "https://localhost:7080/api/SalesOrders",
       {
         userId: 1,
-        orderDate: new Date().toISOString(), // Tarih artık otomatik veriliyor
-        status: newStatus,
-        price: priceNumber,
-        productId: parseInt(productId),
-        warehouseId: parseInt(warehouseId),
-        quantity: parseInt(quantity),
+        
+  status: newStatus,
+  productId: parseInt(productId),
+  warehouseId: parseInt(warehouseId),
+  quantity: parseInt(quantity),
       },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -245,7 +252,8 @@ const SalesOrders = () => {
             <h2 className="text-xl font-semibold mb-4 text-white">Add Sales Order</h2>
             <form onSubmit={handleAddOrder} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <input type="text" placeholder="Price" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} className="p-2 rounded bg-gray-600 text-white border border-gray-600" />
+               
+
                
                 <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)} className="p-2 rounded bg-gray-600 text-white border border-gray-600">
                   <option value="Pending">Pending</option>

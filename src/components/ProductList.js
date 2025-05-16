@@ -17,7 +17,7 @@ const ProductList = () => {
 
     const token = rawToken.trim();
 
-    axios.get('https://localhost:7080/api/Product', {
+    axios.get('https://localhost:7080/api/Product/with-category', {
       headers: {
         Authorization: `Bearer ${token}`
       }
