@@ -17,7 +17,7 @@ const ProductList = () => {
     }
 
     const token = rawToken.trim();
-    const response = API.get("/api/Product/with-category")
+    API.get("/api/Product/with-category")
     .then(response => {
       setProducts(response.data);
     })
