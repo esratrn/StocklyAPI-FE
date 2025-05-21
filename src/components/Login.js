@@ -11,7 +11,7 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await API.post('/login', { email, password });
+      const response = await API.post('/api/Auth/login', { email, password });
       console.log("Login successful!", response.data);
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');

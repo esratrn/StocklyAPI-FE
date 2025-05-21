@@ -33,16 +33,7 @@ function AddProduct() {
 
   try {
     const token = localStorage.getItem('token');
-    await axios.post(
-      "https://localhost:7080/api/Product",
-      product,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
+    const respponse = await API.post("/api/Auth",product);
     alert('Product added!');
   } catch (error) {
     console.error(error);
