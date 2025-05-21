@@ -12,11 +12,11 @@ function Login() {
     e.preventDefault();
     try {
       const response = await API.post('/login', { email, password });
-      console.log("Giriş başarılı!", response.data);
+      console.log("Login successful!", response.data);
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
     } catch (error) {
-      console.error("Giriş başarısız:", error.response?.data || error.message);
+      console.error("Login failed!:", error.response?.data || error.message);
       alert('incorrect login!');
     }
   };

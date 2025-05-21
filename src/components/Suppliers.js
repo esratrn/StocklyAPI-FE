@@ -16,7 +16,7 @@ const Suppliers = () => {
   const itemsPerPage = 5;
   const token = localStorage.getItem("token");
 
-  // ✅ Get suppliers from API
+  
   const fetchSuppliers = async () => {
     try {
       const response = await axios.get("https://localhost:7080/api/Suppliers", {

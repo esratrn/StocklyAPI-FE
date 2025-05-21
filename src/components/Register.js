@@ -28,10 +28,10 @@ function Register() {
     
 
       alert('Kayıt başarılı!');
-      navigate('/dashboard'); // kayıt sonrası yönlendirme
+      navigate('/dashboard'); 
     } catch (error) {
       console.error(error);
-      alert('Kayıt sırasında hata oluştu.');
+      alert('An error occured during registration.');
     }
   };
 

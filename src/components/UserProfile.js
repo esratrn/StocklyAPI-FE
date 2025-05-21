@@ -38,7 +38,7 @@ const UserProfile = () => {
   const handleSave = () => {
     setUser(formData);
     setIsEditing(false);
-    // Güncelleme API isteği yazılabilir (isteğe bağlı)
+    
   };
 
   return (

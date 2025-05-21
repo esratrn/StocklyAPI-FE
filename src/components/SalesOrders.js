@@ -66,7 +66,7 @@ const SalesOrders = () => {
     const selectedProduct = products.find(p => p.id === parseInt(productId));
     if (selectedProduct) {
       const total = selectedProduct.price * parseInt(quantity || 0);
-      setNewPrice(total.toFixed(2)); // otomatik fiyat yazdır
+      setNewPrice(total.toFixed(2)); 
     } else {
       setNewPrice("");
     }

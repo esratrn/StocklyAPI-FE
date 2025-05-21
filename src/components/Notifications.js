@@ -50,7 +50,7 @@ const Notifications = () => {
         const data = await response.json();
         setNotifications(data);
       } catch (error) {
-        console.error("Bildirimler alınamadı:", error);
+        console.error("Fail to fetch notifications:", error);
       }
     };
 
@@ -60,7 +60,7 @@ const Notifications = () => {
   return (
     <div className="space-y-4 p-8 pt-16 min-h-screen bg-gray-500">
       {notifications.length === 0 ? (
-        <p className="text-white">Hiç bildirim yok.</p>
+        <p className="text-white">No notifications available</p>
       ) : (
         notifications.map((n) => (
           <Notification key={n.id} type={n.type} message={n.message} />

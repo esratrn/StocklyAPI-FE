@@ -18,7 +18,7 @@ useEffect(() => {
     return;
   }
 
-  const token = rawToken.trim(); // 🔧 ÖNEMLİ: Fazla boşluk varsa temizler
+  const token = rawToken.trim(); 
 
   console.log("Stored token:", token);
 
