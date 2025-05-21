@@ -17,14 +17,18 @@ const ProductList = () => {
     }
 
     const token = rawToken.trim();
-    API.get("/api/Product/with-category")
-    .then(response => {
-      setProducts(response.data);
-    })
-    .catch(error => {
-      console.error('Error fetching products:', error);
-    });
-  }, []);
+    API.get("/api/Product/with-category", {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+})
+.then(response => {
+  setProducts(response.data);
+})
+.catch(error => {
+  console.error('Error fetching products:', error);
+});
+
 
   const filteredData = products.filter(item =>
     item.productName.toLowerCase().includes(searchTerm.toLowerCase())
