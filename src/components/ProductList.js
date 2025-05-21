@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import API from '../services/api';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -16,12 +17,8 @@ const ProductList = () => {
     }
 
     const token = rawToken.trim();
-
-    axios.get('https://localhost:7080/api/Product/with-category', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    API.get("/api/Product/with-category");
+    
     .then(response => {
       setProducts(response.data);
     })
