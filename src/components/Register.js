@@ -5,14 +5,14 @@ import API from '../services/api';
 function Register() {
   const navigate = useNavigate();
 
-  // State'ler
+ 
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
 
-  // Form submit
+  
   const handleRegister = async (e) => {
     e.preventDefault();
 

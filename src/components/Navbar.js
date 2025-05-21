@@ -23,9 +23,9 @@ useEffect(() => {
 }, []);
 
 const handleLogout = () => {
-  // (Varsa) kullanıcı oturum verilerini temizle
-  localStorage.removeItem('token'); // örnek
-  // Login sayfasına yönlendir
+  
+  localStorage.removeItem('token'); 
+  
   navigate('/login');
 };
     return (
