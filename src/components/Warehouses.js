@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../services/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -15,27 +15,25 @@ const Warehouses = () => {
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const token = localStorage.getItem("token");
+ 
 
   // GET
   useEffect(() => {
-    axios
-      .get("https://localhost:7080/api/warehouses", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        const mapped = res.data.map((item) => ({
-          id: item.id,
-          warehouse_name: item.warehouseName,
-          location: item.location,
-        }));
-        setWarehouses(mapped);
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        toast.error("Failed to load warehouses");
-      });
-  }, []);
+  API.get("/api/warehouses")
+    .then((res) => {
+      const mapped = res.data.map((item) => ({
+        id: item.id,
+        warehouse_name: item.warehouseName,
+        location: item.location,
+      }));
+      setWarehouses(mapped);
+    })
+    .catch((err) => {
+      console.error("Fetch error:", err);
+      toast.error("Failed to load warehouses");
+    });
+}, []);
+
 
   const handleEdit = (wh) => {
     setFormData({
@@ -49,9 +47,8 @@ const Warehouses = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this warehouse?")) {
       try {
-        await axios.delete(`https://localhost:7080/api/warehouses/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await API.delete(`/api/warehouses/${id}`);
+
         setWarehouses((prev) => prev.filter((w) => w.id !== id));
         toast.success("Warehouse deleted 🗑");
       } catch {
@@ -60,46 +57,45 @@ const Warehouses = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { warehouse_name, location } = formData;
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const { warehouse_name, location } = formData;
 
-    if (!warehouse_name || !location) {
-      toast.error("Please fill in all fields ❌");
-      return;
+  if (!warehouse_name || !location) {
+    toast.error("Please fill in all fields ❌");
+    return;
+  }
+
+  try {
+    if (editingId) {
+      await API.put(`/api/warehouses/${editingId}`, {
+        warehouseName: warehouse_name,
+        location
+      });
+
+      const updated = warehouses.map((w) =>
+        w.id === editingId ? { ...w, ...formData } : w
+      );
+      setWarehouses(updated);
+      toast.success("Warehouse updated ✅");
+    } else {
+      const res = await API.post("/api/warehouses", {
+        warehouseName: warehouse_name,
+        location
+      });
+
+      setWarehouses([...warehouses, res.data]);
+      toast.success("New warehouse added 🎉");
     }
+  } catch {
+    toast.error("Save failed 😓");
+  }
 
-    try {
-      if (editingId) {
-        await axios.put(
-          `https://localhost:7080/api/warehouses/${editingId}`,
-          { warehouseName: warehouse_name, location },
+  setFormData({ warehouse_name: "", location: "" });
+  setEditingId(null);
+  setShowForm(false);
+};
 
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const updated = warehouses.map((w) =>
-          w.id === editingId ? { ...w, ...formData } : w
-        );
-        setWarehouses(updated);
-        toast.success("Warehouse updated ✅");
-      } else {
-        const res = await axios.post(
-          "https://localhost:7080/api/warehouses",
-         { warehouseName: warehouse_name, location },
-
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setWarehouses([...warehouses, res.data]);
-        toast.success("New warehouse added 🎉");
-      }
-    } catch {
-      toast.error("Save failed 😓");
-    }
-
-    setFormData({ warehouse_name: "", location: "" });
-    setEditingId(null);
-    setShowForm(false);
-  };
 
   const filtered = warehouses.filter((w) =>
     (w?.warehouse_name || "").toLowerCase().includes(searchTerm.toLowerCase())
