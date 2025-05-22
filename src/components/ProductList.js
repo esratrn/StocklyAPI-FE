@@ -17,10 +17,7 @@ const ProductList = () => {
     }
 
     const token = rawToken.trim();
-    API.get("/api/Product/with-category", {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
+    API.get("/api/Poduct/with-category")
 })
 .then(response => {
   setProducts(response.data);
