@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import API from "../services/api";
+
 import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
@@ -41,13 +43,10 @@ const Notifications = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch("https://localhost:7080/api/Notifications", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
+        
+        const response = await API.get("/api/Notifications");
+const data = response.data;
+
         setNotifications(data);
       } catch (error) {
         console.error("Fail to fetch notifications:", error);
