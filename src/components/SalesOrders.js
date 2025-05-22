@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import API from "../services/api";
 
 const SalesOrders = () => {
   const [salesData, setSalesData] = useState([]);
@@ -13,7 +14,6 @@ const SalesOrders = () => {
   const [editingStatus, setEditingStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const token = localStorage.getItem("token");
   const [productId, setProductId] = useState("");
   const [warehouseId, setWarehouseId] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -24,37 +24,34 @@ const SalesOrders = () => {
 
 
   const fetchSalesOrders = async () => {
-    try {
-      const response = await axios.get("https://localhost:7080/api/SalesOrders", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setSalesData(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch sales orders.");
-    }
-  };
+  try {
+    const response = await API.get("/api/SalesOrders");
+    setSalesData(response.data);
+  } catch (error) {
+    toast.error("Failed to fetch sales orders.");
+  }
+};
+
 
   const fetchProducts = async () => {
-    try {
-      const response = await axios.get("https://localhost:7080/api/Product/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProducts(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch products.");
-    }
-  };
+  try {
+    const response = await API.get("/api/Product/all");
+    setProducts(response.data);
+  } catch (error) {
+    toast.error("Failed to fetch products.");
+  }
+};
+
 
   const fetchWarehouses = async () => {
-    try {
-      const response = await axios.get("https://localhost:7080/api/Warehouse/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setWarehouses(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch warehouses ❌");
-    }
-  };
+  try {
+    const response = await API.get("/api/Warehouse/all");
+    setWarehouses(response.data);
+  } catch (error) {
+    toast.error("Failed to fetch warehouses ❌");
+  }
+};
+
 
   useEffect(() => {
     fetchSalesOrders();
@@ -79,36 +76,30 @@ const SalesOrders = () => {
   toast.error("Please fill in all fields.");
   return;
 }
-
-
   
-  try {
-    const response = await axios.post(
-      "https://localhost:7080/api/SalesOrders",
-      {
-        userId: 1,
-        
-  status: newStatus,
-  productId: parseInt(productId),
-  warehouseId: parseInt(warehouseId),
-  quantity: parseInt(quantity),
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+ try {
+  const response = await API.post("/api/SalesOrders", {
+    userId: 1,
+    status: newStatus,
+    productId: parseInt(productId),
+    warehouseId: parseInt(warehouseId),
+    quantity: parseInt(quantity),
+  });
+  console.log("Sales order added:", response.data);
 
-    setSalesData([response.data, ...salesData]);
-    setNewPrice("");
-    setNewStatus("Pending");
-    setProductId("");
-    setWarehouseId("");
-    setQuantity("");
-    setShowForm(false);
-    toast.success("Order added successfully!");
-  } catch (error) {
-    toast.error("Failed to add order.");
-  }
+
+  setSalesData([response.data, ...salesData]);
+  setNewPrice("");
+  setNewStatus("Pending");
+  setProductId("");
+  setWarehouseId("");
+  setQuantity("");
+  setShowForm(false);
+  toast.success("Order added successfully!");
+} catch (error) {
+  toast.error("Failed to add order.");
+}
+
 };
 
   const handleEditOrder = (orderId) => {
@@ -118,28 +109,23 @@ const SalesOrders = () => {
   };
 
   const handleSaveStatus = async (orderId) => {
-    const orderToEdit = salesData.find((o) => o.id === orderId);
-    try {
-      await axios.put(
-        `https://localhost:7080/api/SalesOrders/${orderId}`,
-        {
-          id: orderId,
-          userId: orderToEdit.userId,
-          orderDate: orderToEdit.orderDate,
-          status: editingStatus,
-          price: orderToEdit.price,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      toast.success("Status updated!");
-      fetchSalesOrders();
-      setEditingId(null);
-    } catch (error) {
-      toast.error("Failed to update status.");
-    }
-  };
+  const orderToEdit = salesData.find((o) => o.id === orderId);
+  try {
+    await API.put(`/api/SalesOrders/${orderId}`, {
+      id: orderId,
+      userId: orderToEdit.userId,
+      orderDate: orderToEdit.orderDate,
+      status: editingStatus,
+      price: orderToEdit.price,
+    });
+
+    toast.success("Status updated!");
+    fetchSalesOrders();
+    setEditingId(null);
+  } catch (error) {
+    toast.error("Failed to update status.");
+  }
+};
 
   const filteredOrders = salesData.filter(
     (order) =>
