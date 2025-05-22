@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+
 import API from '../services/api';
 
 const ProductList = () => {
@@ -10,21 +10,19 @@ const ProductList = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const rawToken = localStorage.getItem('token');
-    if (!rawToken) {
-      console.error("No token found.");
-      return;
+  const fetchProducts = async () => {
+    try {
+      const res = await API.get("/api/Product/with-category");  // ✅ doğru endpoint
+      console.log("Products fetched:", res.data);
+      setProducts(res.data);
+    } catch (err) {
+      console.error("API error (with-category):", err);
     }
+  };
 
-    const token = rawToken.trim();
-    API.get("/api/Poduct/with-category")
-})
-.then(response => {
-  setProducts(response.data);
-})
-.catch(error => {
-  console.error('Error fetching products:', error);
-});
+  fetchProducts();
+}, []);
+
 
 
   const filteredData = products.filter(item =>
