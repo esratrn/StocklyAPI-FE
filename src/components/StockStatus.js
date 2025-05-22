@@ -1,50 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../services/api'; 
 
 const StockStatus = () => {
-    const [stockData, setStockData] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
-    const [searchTerm, setSearchTerm] = useState('');
-    const [hideZeroStock, setHideZeroStock] = useState(false);
-    const token = localStorage.getItem("token");
-    console.log("Stored token:", localStorage.getItem("token"));
+  const [stockData, setStockData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const [searchTerm, setSearchTerm] = useState('');
+  const [hideZeroStock, setHideZeroStock] = useState(false);
 
 
 useEffect(() => {
-  const rawToken = localStorage.getItem('token');
-  if (!rawToken) {
-    console.error("No token found.");
-    return;
-  }
+    const fetchStockStatus = async () => {
+      try {
+        const res = await API.get("/api/Product/stock-status"); // ✅ Swagger endpoint
+        setStockData(res.data);
+        console.log("Stock status fetched:", res.data);
+      } catch (error) {
+        console.error("Error fetching stock status:", error);
+      }
+    };
 
-  const token = rawToken.trim(); 
-
-  console.log("Stored token:", token);
-
-  axios.get('https://localhost:7080/api/Product/stock-status', {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
-  .then(response => {
-    setStockData(response.data);
-  })
-  .catch(error => {
-    console.error('Error fetching stock status:', error);
-  });
-}, []);
+    fetchStockStatus();
+  }, []);
 
 
 
     const filteredData = stockData
-        .filter(item =>
-            item.productName.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-        .filter(item => hideZeroStock ? item.currentQuantity > 0 : true);
+    .filter(item =>
+      item.productName.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter(item => hideZeroStock ? item.currentQuantity > 0 : true);
 
-    const totalPages = Math.max(1, Math.ceil(filteredData.length / itemsPerPage));
-
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / itemsPerPage));
     return (
         <div className="min-h-screen bg-gray-400 text-white p-8 pt-16">
             <h1 className="text-3xl font-bold mb-6">Stock Status</h1>
