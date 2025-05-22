@@ -14,26 +14,24 @@ function Register() {
 
   
   const handleRegister = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      await API.post("/register", {
-  FirstName: name,
-  LastName: surname,
-  Email: email,
-  Password: password,
-  JobTitle: role,
-});
+  try {
+    await API.post("/api/Auth/register", {
+      firstName: name,
+      lastName: surname,
+      email: email,
+      password: password,
+      jobTitle: role,
+    });
 
-    
-
-      alert('Kayıt başarılı!');
-      navigate('/dashboard'); 
-    } catch (error) {
-      console.error(error);
-      alert('An error occured during registration.');
-    }
-  };
+    alert("Kayıt başarılı!");
+    navigate("/dashboard");
+  } catch (error) {
+    console.error(error);
+    alert("An error occurred during registration.");
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
