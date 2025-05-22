@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
-import axios from 'axios';
+import API from "../services/api";
 
 let chartInstance = null;
 
@@ -15,13 +15,7 @@ function Dashboard() {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    axios.get("https://localhost:7080/api/dashboard", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    API.get("/api/dashboard")
     .then(res => {
       setWeeklyReport(res.data.weeklyReport || []);
       setStats({
