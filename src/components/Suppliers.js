@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../services/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,21 +14,17 @@ const Suppliers = () => {
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const token = localStorage.getItem("token");
+  
 
   
   const fetchSuppliers = async () => {
-    try {
-      const response = await axios.get("https://localhost:7080/api/Suppliers", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setSuppliers(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch suppliers ❌");
-    }
-  };
+  try {
+    const response = await API.get("/api/Suppliers");
+    setSuppliers(response.data);
+  } catch (error) {
+    toast.error("Failed to fetch suppliers ❌");
+  }
+};
 
   useEffect(() => {
     fetchSuppliers();
@@ -47,11 +43,8 @@ const Suppliers = () => {
     const confirmDelete = window.confirm("Are you sure you want to delete this supplier?");
     if (confirmDelete) {
       try {
-        await axios.delete(`https://localhost:7080/api/Suppliers/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        await API.delete(`/api/Suppliers/${id}`);
+
         toast.success("Supplier deleted 🗑");
         fetchSuppliers();
       } catch (error) {
@@ -60,44 +53,37 @@ const Suppliers = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!formData.supplier_name || !formData.contact_info) {
-      toast.error("Please fill in all fields ❌");
-      return;
-    }
+  if (!formData.supplier_name || !formData.contact_info) {
+    toast.error("Please fill in all fields ❌");
+    return;
+  }
 
-    const payload = {
-      supplierName: formData.supplier_name,
-      contactInfo: formData.contact_info,
-    };
-
-    try {
-      if (editingId) {
-        await axios.put(`https://localhost:7080/api/Suppliers/${editingId}`, payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        toast.success("Supplier updated ✅");
-      } else {
-        await axios.post("https://localhost:7080/api/Suppliers", payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        toast.success("New supplier added 🎉");
-      }
-
-      setFormData({ supplier_name: "", contact_info: "" });
-      setEditingId(null);
-      setShowForm(false);
-      fetchSuppliers();
-    } catch (error) {
-      toast.error("Error saving supplier ❌");
-    }
+  const payload = {
+    supplierName: formData.supplier_name,
+    contactInfo: formData.contact_info,
   };
+
+  try {
+    if (editingId) {
+      await API.put(`/api/Suppliers/${editingId}`, payload);
+      toast.success("Supplier updated ✅");
+    } else {
+      await API.post("/api/Suppliers", payload);
+      toast.success("New supplier added 🎉");
+    }
+
+    setFormData({ supplier_name: "", contact_info: "" });
+    setEditingId(null);
+    setShowForm(false);
+    fetchSuppliers();
+  } catch (error) {
+    toast.error("Error saving supplier ❌");
+  }
+};
+
 
   const filtered = suppliers.filter((s) =>
     s.supplierName.toLowerCase().includes(searchTerm.toLowerCase())
