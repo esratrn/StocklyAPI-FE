@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import API from "../services/api";
 
 const PurchaseOrders = () => {
   const [purchaseData, setPurchaseData] = useState([]);
@@ -21,42 +21,39 @@ const PurchaseOrders = () => {
   const [quantity, setQuantity] = useState("");
   const [products, setProducts] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
-  const token = localStorage.getItem("token");
+  
 
-  const fetchPurchaseOrders = async () => {
-    try {
-      const response = await axios.get("https://localhost:7080/api/PurchaseOrders");
-      const sorted = response.data.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+ const fetchPurchaseOrders = async () => {
+  try {
+    const response = await API.get("/api/PurchaseOrders");
+    const sorted = response.data.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
     setPurchaseData(sorted);
-   
-    } catch (error) {
-      console.error("Error fetching purchase orders:", error);
-      toast.error("Failed to load purchase orders ❌");
-    }
-  };
+  } catch (error) {
+    console.error("Error fetching purchase orders:", error);
+    toast.error("Failed to load purchase orders ❌");
+  }
+};
 
   const fetchProducts = async () => {
-    try {
-      const response = await axios.get("https://localhost:7080/api/Product/all", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Product fetch failed: ", error);
-      toast.error("Failed to load products ❌");
-    }
-  };
+  try {
+    const response = await API.get("/api/Product/all");
+    setProducts(response.data);
+  } catch (error) {
+    console.error("Product fetch failed: ", error);
+    toast.error("Failed to load products ❌");
+  }
+};
+
 
   const fetchWarehouses = async () => {
-    try {
-      const response = await axios.get("https://localhost:7080/api/Warehouse/all", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setWarehouses(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch warehouses ❌");
-    }
-  };
+  try {
+    const response = await API.get("/api/Warehouse/all");
+    setWarehouses(response.data);
+  } catch (error) {
+    toast.error("Failed to fetch warehouses ❌");
+  }
+};
+
 
   useEffect(() => {
     fetchPurchaseOrders();
@@ -74,15 +71,14 @@ const PurchaseOrders = () => {
 
 
     try {
-      await axios.post("https://localhost:7080/api/PurchaseOrders", {
+      const response = await API.post("/api/PurchaseOrders", {
   supplierId: supplierIdValue,
   status: newStatus,
   productId: parseInt(productId),
   warehouseId: parseInt(warehouseId),
   quantity: parseInt(quantity)
-}, {
-  headers: { Authorization: `Bearer ${token}` }
 });
+
 
 
       toast.success("Purchase order added!");
@@ -103,12 +99,13 @@ const PurchaseOrders = () => {
   const handleSaveStatus = async (orderId) => {
     try {
       const orderToUpdate = purchaseData.find((o) => o.id === orderId);
-      await axios.put(`https://localhost:7080/api/PurchaseOrders/${orderId}`, {
-        supplierId: orderToUpdate.supplierId,
-        orderDate: orderToUpdate.orderDate,
-        price: orderToUpdate.price,
-        status: editedStatus,
-      });
+      await API.put(`/api/PurchaseOrders/${orderId}`, {
+  supplierId: orderToUpdate.supplierId,
+  orderDate: orderToUpdate.orderDate,
+  price: orderToUpdate.price,
+  status: editedStatus,
+});
+
       toast.success("Status updated!");
       setEditingOrderId(null);
       fetchPurchaseOrders();
