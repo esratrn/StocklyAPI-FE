@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import API from '../services/api';
-import axios from 'axios';
+
 
 function AddProduct() {
   const [name, setName] = useState('');
@@ -33,14 +33,14 @@ function AddProduct() {
   };
 
   try {
-    const token = localStorage.getItem('token');
-    const respponse = await API.post("/api/Auth",product);
-    alert('Product added!');
-  } catch (error) {
-    console.error(error);
-    alert('Failed to add product.');
-  }
-};
+      const response = await API.post("/api/Product", product); // ✅ Doğru endpoint
+      alert('Product added!');
+      console.log("Product added:", response.data);
+    } catch (error) {
+      console.error("Add product failed:", error);
+      alert('Failed to add product.');
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-400">

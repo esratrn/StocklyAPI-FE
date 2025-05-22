@@ -12,7 +12,7 @@ const ProductList = () => {
   useEffect(() => {
   const fetchProducts = async () => {
     try {
-      const res = await API.get("/api/Product/with-category");  // ✅ doğru endpoint
+      const res = await API.get("/api/Product/with-category");  
       console.log("Products fetched:", res.data);
       setProducts(res.data);
     } catch (err) {

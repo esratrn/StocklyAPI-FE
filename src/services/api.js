@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://stockly-epfmbzcmd9a9fsg3.westeurope-01.azurewebsites.net' // ❌ /api EKLENMEYECEK!
+  baseURL: 'https://stockly-epfmbzcmd9a9fsg3.westeurope-01.azurewebsites.net' 
 });
 
 API.interceptors.request.use((config) => {
