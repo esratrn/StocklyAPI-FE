@@ -12,7 +12,7 @@ const StockStatus = () => {
 useEffect(() => {
     const fetchStockStatus = async () => {
       try {
-        const res = await API.get("/api/Product/stock-status"); // ✅ Swagger endpoint
+        const res = await API.get("/api/Product/stock-status"); 
         setStockData(res.data);
         console.log("Stock status fetched:", res.data);
       } catch (error) {

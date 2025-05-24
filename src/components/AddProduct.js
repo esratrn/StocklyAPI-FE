@@ -33,7 +33,7 @@ function AddProduct() {
   };
 
   try {
-      const response = await API.post("/api/Product", product); // ✅ Doğru endpoint
+      const response = await API.post("/api/Product", product);
       alert('Product added!');
       console.log("Product added:", response.data);
     } catch (error) {

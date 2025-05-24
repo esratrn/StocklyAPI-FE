@@ -8,7 +8,7 @@ import {
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 
-// Bildirim bileşeni
+
 const Notification = ({ type = "info", message }) => {
   const iconMap = {
     success: <CheckCircleIcon className="h-6 w-6 mr-3" />,
@@ -36,7 +36,7 @@ const Notification = ({ type = "info", message }) => {
   );
 };
 
-// API'den veri çeken versiyon
+
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
 

@@ -17,7 +17,7 @@ const Warehouses = () => {
   const itemsPerPage = 5;
  
 
-  // GET
+ 
   useEffect(() => {
   API.get("/api/warehouses")
     .then((res) => {
