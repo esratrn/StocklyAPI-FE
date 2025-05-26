@@ -64,7 +64,7 @@ const ProductList = () => {
                 <tr key={index} className="border-t border-gray-600 hover:bg-gray-700 transition">
                   <td className="px-6 py-4">{item.productName}</td>
                   <td className="px-6 py-4">{item.categoryName}</td>
-                  <td className="px-6 py-4">₺{item.price}</td>
+                  <td className="px-6 py-4">${item.price}</td>
                 </tr>
               ))}
           </tbody>
